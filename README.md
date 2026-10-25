@@ -1,5 +1,7 @@
 # Pracownia
 
+**Adres:** https://pracownia-2ac.pages.dev
+
 Samodzielna wersja Pracowni (projekty, zadania, notatki blokowe, czas pracy, raporty PDF) na własnej domenie. Fork artefaktu z claude.ai, który zostaje bez zmian.
 
 - **Frontend:** SvelteKit 3 (Svelte 5, TypeScript) w trybie SPA, adapter-static
@@ -32,7 +34,7 @@ Kontekst i decyzje: `reference/brief.md`. Pełny kod oryginału, z którego prze
 3. **Authentication → Sign In / Providers → Email**: włącz logowanie e-mailem. W ustawieniach ogólnych wyłącz **Allow new users to sign up**, bo konta są tylko na zaproszenie.
 4. **Authentication → URL Configuration**: w _Site URL_ wpisz adres aplikacji (lokalnie `http://localhost:5173`), a w _Redirect URLs_ dodaj także adres z Cloudflare Pages.
 5. **Authentication → Users → Invite user**: zaproś siebie. Przy pierwszym logowaniu powstanie Twoja przestrzeń „Moja pracownia”.
-6. **Project Settings → API**: skopiuj _Project URL_ i klucz _anon public_.
+6. **Project Settings → API Keys**: skopiuj klucz _publishable_ (nigdy _secret_).
 
 ### 2. Lokalnie
 
@@ -54,7 +56,7 @@ W Pracowni na claude.ai: **Ustawienia → Kopia zapasowa (JSON)**. Tutaj: **Usta
 
 - Build command: `npm run build`
 - Build output directory: `build`
-- Zmienne środowiskowe: `VITE_SUPABASE_URL`, `VITE_SUPABASE_ANON_KEY`
+- Zmienne środowiskowe: `VITE_SUPABASE_URL`, `VITE_SUPABASE_ANON_KEY` (klucz _publishable_ `sb_publishable_…` albo starszy _anon_), `NODE_VERSION=22`
 
 Każda gałąź dostaje własny adres podglądu. Własna domena w etapie 4.
 
