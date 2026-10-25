@@ -19,12 +19,13 @@
 	import { page } from '$app/state';
 	import { onMount } from 'svelte';
 	import type { LayoutProps } from './$types';
-	import { app, arr, hasPending, initAuth } from '#lib/store.svelte.ts';
+	import { app, arr, hasPending, initAuth, startLocal } from '#lib/store.svelte.ts';
 	import { configured } from '#lib/supabase.ts';
 	import { applySkin } from '#lib/skins.ts';
 	import { todayISO } from '#lib/util.ts';
 	import Icon from '#lib/ui/Icon.svelte';
 	import Login from '#lib/ui/Login.svelte';
+	import TaskSheet from '#lib/ui/TaskSheet.svelte';
 	import type { IconName } from '#lib/ui/icons.ts';
 
 	let { children }: LayoutProps = $props();
@@ -80,7 +81,7 @@
 	<title>{title} · Pracownia</title>
 </svelte:head>
 
-{#if !configured}
+{#if !configured && !app.local}
 	<div class="setup">
 		<div class="panel">
 			<h2>Brak konfiguracji Supabase</h2>
@@ -88,11 +89,15 @@
 				Skopiuj <code>.env.example</code> do <code>.env</code> i wpisz adres projektu oraz klucz anon.
 				Szczegóły w README.
 			</p>
+			<button class="btn" onclick={startLocal}>Wypróbuj bez logowania</button>
+			<p class="note-s">
+				W trybie próbnym nic się nie zapisuje. Dane znikną po odświeżeniu strony.
+			</p>
 		</div>
 	</div>
-{:else if !app.authReady}
+{:else if !app.authReady && !app.local}
 	<div class="setup"><span class="muted">Ładuję…</span></div>
-{:else if !app.session}
+{:else if !app.session && !app.local}
 	<Login />
 {:else}
 	<div class="app">
@@ -123,11 +128,13 @@
 					><Icon name="sliders" />Ustawienia</a
 				>
 				<div class="sync" class:off={app.dbState !== 'on'}>
-					<i></i>{app.dbState === 'on'
-						? 'Zapis włączony'
-						: app.dbState === 'off'
-							? 'Brak połączenia z bazą'
-							: 'Łączę z zapisem…'}
+					<i></i>{app.local
+						? 'Tryb próbny, bez zapisu'
+						: app.dbState === 'on'
+							? 'Zapis włączony'
+							: app.dbState === 'off'
+								? 'Brak połączenia z bazą'
+								: 'Łączę z zapisem…'}
 				</div>
 			</div>
 		</aside>
@@ -154,6 +161,7 @@
 			<a class="tab" class:on={isOn('/czas')} href="/czas"><Icon name="clock" size={21} />Czas</a>
 		</nav>
 	</div>
+	<TaskSheet />
 {/if}
 
 {#if app.toastMsg}
@@ -180,6 +188,12 @@
 	}
 	.setup .panel {
 		max-width: 460px;
+	}
+	.setup p {
+		margin: 0;
+	}
+	.setup .btn {
+		align-self: flex-start;
 	}
 	:global(a.nav-i),
 	:global(a.side-proj),

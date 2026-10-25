@@ -17,7 +17,8 @@ Kontekst i decyzje: `reference/brief.md`. Pełny kod oryginału, z którego prze
 | Warstwa danych: wczytanie, zapis z opóźnieniem, Realtime                 | gotowe                            |
 | Import i eksport kopii JSON (także z Pracowni na claude.ai)              | gotowe                            |
 | Powłoka, nawigacja, skórki (presety), ekran Start (podgląd)              | gotowe                            |
-| Zadania (lista, kanban), Projekty, Notatki z edytorem blokowym           | do przeniesienia                  |
+| Zadania: lista, kanban z przeciąganiem, okno zadania, Start              | gotowe                            |
+| Projekty, Notatki z edytorem blokowym                                    | do przeniesienia                  |
 | Schematy Mermaid (bez generowania przez AI)                              | do przeniesienia                  |
 | Czas pracy, raporty PDF                                                  | do przeniesienia                  |
 | Okno Wygląd (własne skórki), wyszukiwarka, szybkie dodawanie, import .md | do przeniesienia                  |
@@ -40,6 +41,8 @@ cp .env.example .env    # wpisz VITE_SUPABASE_URL i VITE_SUPABASE_ANON_KEY
 npm install
 npm run dev
 ```
+
+Bez pliku `.env` aplikacja pokazuje przycisk **Wypróbuj bez logowania**: tryb próbny, w którym nic się nie zapisuje.
 
 ### 3. Przeniesienie danych
 

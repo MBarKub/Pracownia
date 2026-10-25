@@ -20,6 +20,7 @@ class AppState {
 	loaded = $state(false);
 	settings = $state<Settings>(mergeSettings(lsGet('pracownia-settings-cache')));
 	data = $state<Store>({ projects: {}, tasks: {}, notes: {}, time: {} });
+	local = $state(false);
 	toastMsg = $state<{ msg: string; action?: string; fn?: () => void } | null>(null);
 
 	get userId() {
@@ -294,7 +295,27 @@ export async function initAuth() {
 	});
 }
 
-export const signOut = () => supabase.auth.signOut();
+export const signOut = () => {
+	if (app.local) {
+		app.local = false;
+		app.session = null;
+		app.loaded = false;
+		app.data = { projects: {}, tasks: {}, notes: {}, time: {} };
+		return;
+	}
+	return supabase.auth.signOut();
+};
+
+/** Tryb próbny bez Supabase: dane żyją tylko w tej karcie przeglądarki. */
+export function startLocal() {
+	app.local = true;
+	app.session = { user: { id: 'local', email: 'tryb próbny' } } as unknown as Session;
+	app.workspaceName = 'Tryb próbny';
+	app.role = 'owner';
+	app.dbState = 'off';
+	app.loaded = true;
+	applySkin(app.settings);
+}
 
 /** Do eksportu kopii — snapshot bez proxy */
 export function snapshotData() {

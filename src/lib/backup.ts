@@ -12,14 +12,14 @@ import {
 } from './model';
 import { app, save, snapshotData } from './store.svelte';
 import { mergeSettings, applySkin } from './skins';
-import { todayISO } from './util';
+import { clone, todayISO } from './util';
 
 export function exportObj() {
 	return {
 		app: 'pracownia',
 		version: 3,
 		exportedAt: new Date().toISOString(),
-		settings: $state.snapshot(app.settings),
+		settings: clone(app.settings),
 		...snapshotData()
 	};
 }
