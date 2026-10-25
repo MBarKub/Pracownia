@@ -16,9 +16,13 @@
 		});
 		if (error) {
 			phase = 'error';
-			message = /signups not allowed|not found/i.test(error.message)
-				? 'Ten adres nie ma konta. Poproś właściciela przestrzeni o zaproszenie.'
-				: 'Nie udało się wysłać linku. Spróbuj za chwilę.';
+			const code = (error as { code?: string }).code || '';
+			message =
+				code === 'over_email_send_rate_limit' || error.status === 429
+					? 'Wysłano już za dużo e-maili. Supabase bez własnego serwera poczty pozwala na kilka na godzinę. Spróbuj później.'
+					: code === 'otp_disabled' || /signups not allowed|not found/i.test(error.message)
+						? 'Ten adres nie ma konta. Poproś właściciela przestrzeni o zaproszenie.'
+						: `Nie udało się wysłać linku (${error.message}).`;
 		} else phase = 'sent';
 	}
 </script>
