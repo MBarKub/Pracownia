@@ -27,8 +27,8 @@ Kontekst i decyzje: `reference/brief.md`. Pełny kod oryginału, z którego prze
 
 ### 1. Projekt Supabase
 
-1. Na [supabase.com](https://supabase.com) utwórz projekt w regionie **Central EU (Frankfurt)**.
-2. **SQL Editor** → wklej i uruchom całość `supabase/migrations/20261025000000_init.sql`.
+1. Na [supabase.com](https://supabase.com) utwórz projekt w regionie w UE (Pracownia: North EU, Sztokholm).
+2. Schemat bazy: **Settings → Integrations → GitHub**, repozytorium `MBarKub/Pracownia`, katalog roboczy `.`, włączone **Deploy to production** z gałęzią `main`. Każdy push na `main` wgrywa nowe migracje z `supabase/migrations`. Bez integracji: wklej plik migracji do **SQL Editor** i uruchom.
 3. **Authentication → Sign In / Providers → Email**: włącz logowanie e-mailem. W ustawieniach ogólnych wyłącz **Allow new users to sign up**, bo konta są tylko na zaproszenie.
 4. **Authentication → URL Configuration**: w _Site URL_ wpisz adres aplikacji (lokalnie `http://localhost:5173`), a w _Redirect URLs_ dodaj także adres z Cloudflare Pages.
 5. **Authentication → Users → Invite user**: zaproś siebie. Przy pierwszym logowaniu powstanie Twoja przestrzeń „Moja pracownia”.
