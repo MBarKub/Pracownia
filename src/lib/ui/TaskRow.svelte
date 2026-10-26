@@ -22,6 +22,7 @@
 <div
 	class="trow"
 	class:is-done={t.status === 'done'}
+	class:is-paused={t.status === 'paused'}
 	class:sel={ui.taskOpen === t.id}
 	role="button"
 	tabindex="0"
@@ -43,6 +44,7 @@
 		<div class="t-meta">
 			{#if p}<ProjChip {p} />{/if}
 			{#if t.status === 'doing'}<span class="pill pill-doing">{L().task.doing}</span>{/if}
+			{#if t.status === 'paused'}<span class="pill pill-paused">{L().task.paused}</span>{/if}
 			{#if subs.length}<span class="meta-i"
 					><Icon name="check" size={12} />{subsDone}/{subs.length}</span
 				>{/if}

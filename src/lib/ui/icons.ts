@@ -29,6 +29,11 @@ export const PATHS = {
 	clock: 'M12 21a9 9 0 1 0 0-18 9 9 0 0 0 0 18zM12 7v5l3 2',
 	play: 'M8 5.5v13l10.5-6.5z',
 	stop: 'M7 7h10v10H7z',
-	pdf: 'M14 3H6a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9zM14 3v6h6M8 17h8M8 13h5'
+	pdf: 'M14 3H6a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9zM14 3v6h6M8 17h8M8 13h5',
+	minus: 'M5 12h14',
+	target: 'M12 3v3M12 18v3M3 12h3M18 12h3M12 15a3 3 0 1 0 0-6 3 3 0 0 0 0 6z',
+	expand: 'M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5',
+	shrink: 'M9 4v5H4M15 4v5h5M9 20v-5H4M15 20v-5h5',
+	mind: 'M12 14a2 2 0 1 0 0-4 2 2 0 0 0 0 4zM10.3 11 6 7.5M13.7 11 18 7.5M10.3 13 6 16.5M13.7 13 18 16.5M4.5 7.5a1.5 1.5 0 1 0 0-.01M19.5 7.5a1.5 1.5 0 1 0 0-.01M4.5 16.5a1.5 1.5 0 1 0 0-.01M19.5 16.5a1.5 1.5 0 1 0 0-.01'
 } as const;
 export type IconName = keyof typeof PATHS;

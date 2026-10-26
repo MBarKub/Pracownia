@@ -8,7 +8,7 @@ Samodzielna wersja Pracowni (projekty, zadania, notatki blokowe, czas pracy, rap
 - **Backend:** Supabase: Postgres, logowanie linkiem e-mail, Row Level Security, Realtime
 - **Hosting:** Cloudflare Pages
 
-Kontekst i decyzje: `reference/brief.md`. Pełny kod oryginału, z którego przenosimy widoki: `reference/pracownia-v4.html`.
+Kontekst i decyzje: `reference/brief.md`. Pełny kod oryginału, z którego przenosimy widoki: `reference/pracownia-v6.html`.
 
 ## Stan prac (etap 1: port 1:1)
 
@@ -21,9 +21,21 @@ Kontekst i decyzje: `reference/brief.md`. Pełny kod oryginału, z którego prze
 | Powłoka, nawigacja, skórki (presety), ekran Start (podgląd)              | gotowe                            |
 | Zadania: lista, kanban z przeciąganiem, okno zadania, Start              | gotowe                            |
 | Projekty, Notatki z edytorem blokowym                                    | do przeniesienia                  |
-| Schematy Mermaid (bez generowania przez AI)                              | do przeniesienia                  |
+| Schematy Mermaid i mapy myśli: komponenty gotowe, podpięcie w edytorze   | gotowe do wpięcia, zob. niżej     |
+| Status zadania „Wstrzymane”                                              | gotowe                            |
 | Czas pracy, raporty PDF                                                  | do przeniesienia                  |
 | Okno Wygląd (własne skórki), wyszukiwarka, szybkie dodawanie, import .md | do przeniesienia                  |
+
+## Schematy i mapy myśli
+
+Moduł z Pracowni v6, bez generowania przez AI. Kod w `src/lib/diagrams/` (logika) i `src/lib/ui/diagrams/` (komponenty).
+
+- **Bloki:** `mermaid` (kod Mermaid) i `mindmap` (konspekt Markdown rysowany przez Markmap). Opcjonalne pola bloku `mermaid`: `layout` (`elk` domyślnie albo `dagre`) i `look` (`classic` albo `handDrawn`).
+- **Wpięcie w edytor blokowy:** dla bloków `mermaid` i `mindmap` wyrenderuj `<DiagramBlock block={b} title={tytułDokumentu} onchange={() => save('notes', id, 700)} />`. Komponent sam zamienia stare mapy Mermaid `mindmap` na konspekt.
+- **Menu „/”:** dodaj „Mapa myśli” (`mindmap`) i „Schemat (Mermaid)” (`mermaid`); skrót ` ```mermaid ` + spacja tworzy blok `mermaid`.
+- **Mapa z notatki:** `blocksToOutline(tytuł, bloki)` z `outline.ts` buduje konspekt z nagłówków i list.
+- **Eksport Markdown:** `diagramBlockToMarkdown(b)` (mapy jako Mermaid `mindmap`, czytelne w Obsidianie).
+- **Biblioteki** (ładowane dopiero przy pierwszym schemacie): `mermaid`, `@mermaid-js/layout-elk`, `markmap-view`, `markmap-common`, `d3`.
 
 ## Uruchomienie
 
