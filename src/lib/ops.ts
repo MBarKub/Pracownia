@@ -95,7 +95,10 @@ export const taskSort = (a: Task, b: Task) =>
 	(b.priority || 0) - (a.priority || 0) ||
 	(a.createdAt || 0) - (b.createdAt || 0);
 
+/** Otwarte = wszystko poza zrobionymi (także wstrzymane). */
 export const openTasks = () => arr('tasks').filter((t) => t.status !== 'done');
+/** Aktywne = otwarte bez wstrzymanych: plan dnia, liczniki, „następne zadanie”. */
+export const activeTasks = () => openTasks().filter((t) => t.status !== 'paused');
 
 export function progress(pid: string) {
 	const ts = arr('tasks').filter((t) => t.projectId === pid);

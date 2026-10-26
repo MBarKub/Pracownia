@@ -1,10 +1,10 @@
 <script lang="ts">
 	import { page } from '$app/state';
 	import { arr } from '#lib/store.svelte.ts';
-	import { L, openTasks, projectsSorted, setTaskStatus, taskSort, dueInfo } from '#lib/ops.ts';
+	import { L, activeTasks, projectsSorted, setTaskStatus, taskSort, dueInfo } from '#lib/ops.ts';
 	import { ui, persistUi } from '#lib/ui.svelte.ts';
 	import { addDays, fmtShort, todayISO } from '#lib/util.ts';
-	import type { Task, TaskStatus } from '#lib/model.ts';
+	import { TASK_STATUSES, type Task, type TaskStatus } from '#lib/model.ts';
 	import Icon from '#lib/ui/Icon.svelte';
 	import TaskRow from '#lib/ui/TaskRow.svelte';
 	import AddLine from '#lib/ui/AddLine.svelte';
@@ -34,7 +34,7 @@
 	] as const;
 
 	const counts = $derived.by(() => {
-		const o = openTasks();
+		const o = activeTasks();
 		return {
 			all: o.length,
 			today: o.filter((x) => x.due && x.due <= t).length,
@@ -55,7 +55,7 @@
 	});
 
 	const groups = $derived.by(() => {
-		const open = list.filter((x) => x.status !== 'done').sort(taskSort);
+		const open = list.filter((x) => x.status !== 'done' && x.status !== 'paused').sort(taskSort);
 		const tm = addDays(1),
 			we = addDays(7);
 		const G: [string, (x: Task) => boolean, string][] = [
@@ -70,6 +70,7 @@
 			(g) => g.items.length
 		);
 	});
+	const paused = $derived(list.filter((x) => x.status === 'paused').sort(taskSort));
 	const done = $derived(
 		ui.showDone
 			? list
@@ -80,7 +81,7 @@
 	);
 
 	const columns = $derived(
-		(['todo', 'doing', 'done'] as TaskStatus[]).map((s) => {
+		TASK_STATUSES.map((s) => {
 			let items = list.filter((x) => x.status === s);
 			items =
 				s === 'done'
@@ -165,15 +166,25 @@
 					{#each g.items as x (x.id)}<TaskRow t={x} />{/each}
 				</div>
 			{:else}
-				<div class="empty">
-					<b>{list.length ? 'Wszystko zrobione' : 'Brak zadań w tym widoku'}</b>
-					<span
-						>{list.length
-							? 'Ten filtr nie ma otwartych zadań.'
-							: 'Wpisz pierwsze zadanie w polu powyżej.'}</span
-					>
-				</div>
+				{#if !paused.length}
+					<div class="empty">
+						<b>{list.length ? 'Wszystko zrobione' : 'Brak zadań w tym widoku'}</b>
+						<span
+							>{list.length
+								? 'Ten filtr nie ma otwartych zadań.'
+								: 'Wpisz pierwsze zadanie w polu powyżej.'}</span
+						>
+					</div>
+				{/if}
 			{/each}
+			{#if paused.length}
+				<div class="tgroup" style="margin-top:18px">
+					<div class="tgroup-h">
+						<span class="eyebrow">{L().task.paused}</span><span class="count">{paused.length}</span>
+					</div>
+					{#each paused as x (x.id)}<TaskRow t={x} />{/each}
+				</div>
+			{/if}
 			{#if done.length}
 				<div class="tgroup" style="margin-top:18px">
 					<div class="tgroup-h">

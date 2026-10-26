@@ -49,7 +49,7 @@ function normProject(v: Any): Project {
 function normTask(v: Any): Task {
 	return {
 		title: s(v.title),
-		status: ['todo', 'doing', 'done'].includes(v.status) ? v.status : 'todo',
+		status: ['todo', 'doing', 'paused', 'done'].includes(v.status) ? v.status : 'todo',
 		priority: Math.max(0, Math.min(3, num(v.priority))),
 		due: dateStr(v.due),
 		projectId: s(v.projectId),

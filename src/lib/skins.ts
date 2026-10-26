@@ -168,7 +168,7 @@ export function defaultSettings(): Settings {
 		radius: 10,
 		density: 'normal',
 		labels: {
-			task: { todo: 'Do zrobienia', doing: 'W toku', done: 'Zrobione' },
+			task: { todo: 'Do zrobienia', doing: 'W toku', paused: 'Wstrzymane', done: 'Zrobione' },
 			project: { idea: 'Pomysł', active: 'W toku', paused: 'Wstrzymany', done: 'Zakończony' },
 			priority: ['Brak', 'Niski', 'Średni', 'Wysoki']
 		},

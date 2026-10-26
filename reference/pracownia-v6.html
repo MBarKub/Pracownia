@@ -137,6 +137,9 @@ textarea.in{resize:vertical; min-height:90px; line-height:1.5}
 .check:hover{border-color:var(--accent); color:color-mix(in srgb, var(--accent) 60%, transparent)}
 .check.st-doing{border-color:var(--warn); background:conic-gradient(var(--warn) 0 50%, transparent 0)}
 .check.st-done{background:var(--ok); border-color:var(--ok); color:var(--surface)}
+.check.st-paused{border-style:dashed; border-color:var(--muted); background:linear-gradient(90deg, transparent 34%, var(--muted) 34% 44%, transparent 44% 56%, var(--muted) 56% 66%, transparent 66%) center/100% 44% no-repeat}
+.is-paused .t-title{color:var(--muted)}
+.pill-paused{color:var(--muted); background:var(--surface-2)}
 .t-main{flex:1; min-width:0; display:flex; flex-direction:column; gap:3px}
 .t-title{overflow-wrap:anywhere}
 .is-done .t-title{color:var(--muted); text-decoration:line-through; text-decoration-color:color-mix(in srgb, var(--muted) 60%, transparent)}
@@ -162,13 +165,13 @@ textarea.in{resize:vertical; min-height:90px; line-height:1.5}
 .addline input{flex:1; min-width:0; border:0; background:transparent; padding:4px 0; outline:none}
 .addline:focus-within{background:var(--hover); color:var(--text)}
 
-.kanban{display:grid; grid-template-columns:repeat(3, minmax(240px,1fr)); gap:14px; overflow-x:auto; padding-bottom:6px}
+.kanban{display:grid; grid-template-columns:repeat(4, minmax(220px,1fr)); gap:14px; overflow-x:auto; padding-bottom:6px}
 .kcol{background:var(--surface-2); border-radius:var(--radius); padding:10px; display:flex; flex-direction:column; gap:8px; min-height:200px; transition:outline-color .15s; outline:2px dashed transparent; outline-offset:-2px}
 .kcol.drop{outline-color:var(--accent)}
 .kcol-h{display:flex; align-items:center; gap:8px; font-weight:600; font-size:14px; padding:2px 4px}
 .kcol-h .count{margin-left:auto; font-family:var(--f-mono); font-size:12px; color:var(--muted); font-weight:400}
 .kdot{width:9px; height:9px; border-radius:50%; background:var(--muted)}
-.kdot.st-doing{background:var(--warn)} .kdot.st-done{background:var(--ok)}
+.kdot.st-doing{background:var(--warn)} .kdot.st-done{background:var(--ok)} .kdot.st-paused{background:transparent; border:1.5px dashed var(--muted)}
 .kbody{display:flex; flex-direction:column; gap:8px}
 .kcard{background:var(--surface); border:1px solid var(--border); border-radius:calc(var(--radius) - 2px); padding:10px 12px; display:flex; flex-direction:column; gap:7px; cursor:grab; text-align:left}
 .kcard:hover{border-color:color-mix(in srgb, var(--accent) 45%, var(--border))}
@@ -267,6 +270,7 @@ textarea.in{resize:vertical; min-height:90px; line-height:1.5}
 .blk.drop-before{box-shadow:0 -2px 0 var(--accent)}
 .blk.drop-after{box-shadow:0 2px 0 var(--accent)}
 .ed-tail{min-height:60px; cursor:text}
+
 /* time tracking */
 .tpill{display:flex; align-items:center; gap:8px; padding:8px 10px; border-radius:var(--radius); background:color-mix(in srgb, var(--bad) 10%, var(--surface)); border:1px solid color-mix(in srgb, var(--bad) 30%, var(--border)); font-size:13px; min-width:0}
 .tpill .dot{width:8px; height:8px; border-radius:50%; background:var(--bad); flex:none; animation:blink 1.6s ease-in-out infinite}
@@ -346,6 +350,34 @@ textarea.in{resize:vertical; min-height:90px; line-height:1.5}
 .mm-ai .btnrow{align-items:center}
 .mm-status{font-size:12.5px; color:var(--muted)}
 @media (max-width: 820px){ .mm-body.mode-split{grid-template-columns:minmax(0,1fr)} .mm-body.mode-split .mm-code{border-right:0; border-bottom:1px solid var(--border)} }
+/* diagram viewer */
+.mm-prev{position:relative; overflow:hidden; padding:0; display:block}
+.mm-stage{transform-origin:0 0; display:flex; justify-content:center; align-items:flex-start; padding:18px; min-height:150px; transition:transform .12s ease-out}
+.mm-prev.panning .mm-stage{transition:none}
+.mm-prev.zoomed{cursor:grab; touch-action:none}
+.mm-prev.panning{cursor:grabbing}
+.mm-prev .mm-stage > svg{max-width:100%; height:auto}
+.mm-ctrls{position:absolute; right:8px; bottom:8px; display:flex; gap:4px; opacity:.55; transition:opacity .15s; z-index:2}
+.mm-prev:hover .mm-ctrls,.mk-prev:hover .mm-ctrls,.mm.full .mm-ctrls,.mm-ctrls:focus-within{opacity:1}
+.mm-ctrls button{width:30px; height:30px; display:grid; place-items:center; border-radius:8px; background:var(--surface); border:1px solid var(--border); color:var(--text); box-shadow:0 1px 3px color-mix(in srgb, var(--text) 12%, transparent)}
+.mm-ctrls button:hover{border-color:var(--accent); color:var(--accent)}
+.mk-prev{position:relative; height:440px; min-width:0; background:radial-gradient(circle at 1px 1px, color-mix(in srgb, var(--text) 7%, transparent) 1px, transparent 0) 0 0/18px 18px}
+.mk-prev svg.mk-svg{width:100%; height:100%; display:block}
+.mk-prev .markmap-foreign{font-family:var(--f-body)}
+.mk-prev .markmap-node > circle{stroke-width:1.6px}
+.mm-body.mode-code .mk-prev{display:none}
+.mm-body.mode-prev .mm-code{display:none}
+.mm.full{position:fixed; inset:0; z-index:45; border-radius:0; border:0; padding-top:env(safe-area-inset-top,0px); padding-bottom:env(safe-area-inset-bottom,0px); padding-left:env(safe-area-inset-left,0px); padding-right:env(safe-area-inset-right,0px); background:var(--surface)}
+.mm.full .mm-body{flex:1; min-height:0}
+.mm.full .mm-prev,.mm.full .mk-prev{height:100%}
+.mm.full .mm-stage{min-height:100%; align-items:center}
+.mm.full .mm-stage > svg{max-height:calc(100vh - 140px)}
+.mm.full .mm-src.bt{height:100%; overflow:auto}
+.mm.full .mm-ctrls{bottom:calc(14px + env(safe-area-inset-bottom,0px)); right:14px}
+.mm.full .mm-ctrls button{width:38px; height:38px}
+body.mm-fs .tabbar, body.mm-fs #kbbar{display:none!important}
+@media (max-width: 820px){ .mk-prev{height:360px} .mm-ctrls{opacity:1} }
+
 
 /* ===== overlays ===== */
 .scrim{position:fixed; inset:0; background:color-mix(in srgb, #000 38%, transparent); z-index:40; animation:fade .15s}
@@ -442,7 +474,7 @@ textarea.in{resize:vertical; min-height:90px; line-height:1.5}
   .tab-add{justify-self:center; width:48px; height:48px; border-radius:16px; background:var(--accent); color:var(--accent-text); display:grid; place-items:center; box-shadow:var(--shadow); margin-top:-14px}
   body.editing .tabbar{display:none}
   .grid2,.pdetail,.fgrid{grid-template-columns:minmax(0,1fr)}
-  .kanban{grid-template-columns:repeat(3, minmax(78vw, 1fr)); scroll-snap-type:x mandatory}
+  .kanban{grid-template-columns:repeat(4, minmax(78vw, 1fr)); scroll-snap-type:x mandatory}
   .kcol{scroll-snap-align:start}
   .sheet{width:100%; top:auto; height:92%; border-left:0; border-top:1px solid var(--border); border-radius:18px 18px 0 0; animation:up .2s ease-out; padding-right:0; padding-left:0}
   .modal,.modal.wide{top:auto; bottom:0; width:100%; max-height:90%; border-radius:18px 18px 0 0; padding-bottom:env(safe-area-inset-bottom,0px); --tx:-50%}
@@ -527,7 +559,12 @@ const P = {
   clock:'M12 21a9 9 0 1 0 0-18 9 9 0 0 0 0 18zM12 7v5l3 2',
   play:'M8 5.5v13l10.5-6.5z',
   stop:'M7 7h10v10H7z',
-  pdf:'M14 3H6a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9zM14 3v6h6M8 17h8M8 13h5'
+  pdf:'M14 3H6a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9zM14 3v6h6M8 17h8M8 13h5',
+  minus:'M5 12h14',
+  target:'M12 3v3M12 18v3M3 12h3M18 12h3M12 15a3 3 0 1 0 0-6 3 3 0 0 0 0 6z',
+  expand:'M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5',
+  shrink:'M9 4v5H4M15 4v5h5M9 20v-5H4M15 20v-5h5',
+  mind:'M12 14a2 2 0 1 0 0-4 2 2 0 0 0 0 4zM10.3 11 6 7.5M13.7 11 18 7.5M10.3 13 6 16.5M13.7 13 18 16.5M4.5 7.5a1.5 1.5 0 1 0 0-.01M19.5 7.5a1.5 1.5 0 1 0 0-.01M4.5 16.5a1.5 1.5 0 1 0 0-.01M19.5 16.5a1.5 1.5 0 1 0 0-.01'
 };
 const ic = (n, s = 18, cls = '') => `<svg class="ic ${cls}" width="${s}" height="${s}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="${P[n]}"/></svg>`;
 const DOTS = new Set(['grip','more']);
@@ -558,7 +595,7 @@ const PCOLORS = ['#3B6FE0','#D2553F','#2F9A6A','#C9902A','#8A58D6','#D04F8C','#2
 
 function defaultSettings() {
   return { skinId:'atrament', customSkins:[], radius:10, density:'normal',
-    labels:{ task:{todo:'Do zrobienia', doing:'W toku', done:'Zrobione'},
+    labels:{ task:{todo:'Do zrobienia', doing:'W toku', paused:'Wstrzymane', done:'Zrobione'},
              project:{idea:'Pomysł', active:'W toku', paused:'Wstrzymany', done:'Zakończony'},
              priority:['Brak','Niski','Średni','Wysoki'] },
     time:{ currency:'zł', defaultRate:0, rounding:0, me:'' } };
@@ -703,7 +740,8 @@ function toggleTask(id) { const t = store.tasks.get(id); if (t) setTaskStatus(id
 function progress(pid) { const ts = arr('tasks').filter(t => t.projectId === pid); return { total:ts.length, done:ts.filter(t => t.status === 'done').length }; }
 const taskSort = (a, b) => (a.due || '9999') .localeCompare(b.due || '9999') || (b.priority || 0) - (a.priority || 0) || (a.createdAt || 0) - (b.createdAt || 0);
 const openTasks = () => arr('tasks').filter(t => t.status !== 'done');
-function blocksText(blocks) { return (blocks || []).filter(b => b.type !== 'hr' && b.type !== 'mermaid').map(b => b.text).join(' ').trim(); }
+const activeTasks = () => openTasks().filter(t => t.status !== 'paused');
+function blocksText(blocks) { return (blocks || []).filter(b => !['hr','mermaid','mindmap'].includes(b.type)).map(b => b.text).join(' ').trim(); }
 
 /* ---------- rendering primitives ---------- */
 function dueInfo(d) {
@@ -717,17 +755,17 @@ function taskRow(t, opt = {}) {
   const p = opt.noProject ? null : (t.projectId && store.projects.get(t.projectId));
   const di = t.status !== 'done' ? dueInfo(t.due) : null;
   const st = t.subtasks || [], sd = st.filter(s => s.done).length;
-  return `<div class="trow ${t.status === 'done' ? 'is-done' : ''} ${ui.taskOpen === t.id ? 'sel' : ''}" data-act="open-task" data-id="${t.id}">
+  return `<div class="trow ${t.status === 'done' ? 'is-done' : ''} ${t.status === 'paused' ? 'is-paused' : ''} ${ui.taskOpen === t.id ? 'sel' : ''}" data-act="open-task" data-id="${t.id}">
     <button class="check st-${t.status}" data-act="toggle-task" data-id="${t.id}" aria-label="${t.status === 'done' ? 'Przywróć zadanie' : 'Oznacz jako zrobione'}">${ic('check', 12)}</button>
     <div class="t-main"><div class="t-title">${esc(t.title || 'Bez tytułu')}</div>
-      <div class="t-meta">${p ? projChip(p) : ''}${t.status === 'doing' ? `<span class="pill pill-doing">${esc(L().task.doing)}</span>` : ''}${st.length ? `<span class="meta-i">${ic('check', 12)}${sd}/${st.length}</span>` : ''}${t.notes ? `<span class="meta-i" title="Ma notatkę">${ic('note', 12)}</span>` : ''}</div></div>
+      <div class="t-meta">${p ? projChip(p) : ''}${t.status === 'doing' ? `<span class="pill pill-doing">${esc(L().task.doing)}</span>` : ''}${t.status === 'paused' ? `<span class="pill pill-paused">${esc(L().task.paused)}</span>` : ''}${st.length ? `<span class="meta-i">${ic('check', 12)}${sd}/${st.length}</span>` : ''}${t.notes ? `<span class="meta-i" title="Ma notatkę">${ic('note', 12)}</span>` : ''}</div></div>
     <div class="t-side">${t.priority > 0 ? `<span class="prio p${t.priority}" title="Priorytet: ${esc(L().priority[t.priority])}">${ic('flag', 14)}</span>` : ''}${t.due ? `<span class="due ${di ? di.cls : ''}">${esc(di ? di.label : fmtShort(t.due))}</span>` : ''}</div>
   </div>`;
 }
 const addLine = (attrs, ph, fk) => `<label class="addline">${ic('plus', 16)}<input data-add="task" ${attrs} data-fk="${fk}" placeholder="${esc(ph)}" enterkeyhint="done" aria-label="${esc(ph)}"></label>`;
 function projCard(p) {
   const {done, total} = progress(p.id), pct = total ? Math.round(done / total * 100) : 0;
-  const next = openTasks().filter(t => t.projectId === p.id).sort(taskSort)[0];
+  const next = activeTasks().filter(t => t.projectId === p.id).sort(taskSort)[0];
   return `<div class="pcard" style="--pc:${esc(p.color)}" data-act="open-project" data-id="${p.id}" tabindex="0" role="button">
     <div class="pcard-top">${ptile(p)}<span class="pill ps-${p.status}">${esc(L().project[p.status] || p.status)}</span></div>
     <div class="pcard-name">${esc(p.name || 'Bez nazwy')}</div>
@@ -755,7 +793,7 @@ function viewHome() {
   const greet = h < 5 ? 'Dobrej nocy' : h < 18 ? 'Dzień dobry' : 'Dobry wieczór';
   const date = new Intl.DateTimeFormat('pl-PL', {weekday:'long', day:'numeric', month:'long'}).format(new Date());
   const t = todayISO(), we = weekEnd();
-  const open = openTasks();
+  const open = activeTasks();
   const today = open.filter(x => x.due && x.due <= t).sort(taskSort);
   const doing = open.filter(x => x.status === 'doing' && !(x.due && x.due <= t)).sort(taskSort);
   const week = open.filter(x => x.due && x.due > t && x.due <= addDays(7)).sort(taskSort);
@@ -798,7 +836,7 @@ function filteredTasks() {
 function viewTasks() {
   const list = filteredTasks();
   const t = todayISO();
-  const counts = { all:openTasks().length, today:openTasks().filter(x => x.due && x.due <= t).length, overdue:openTasks().filter(x => x.due && x.due < t).length };
+  const counts = { all:openTasks().length, today:activeTasks().filter(x => x.due && x.due <= t).length, overdue:activeTasks().filter(x => x.due && x.due < t).length };
   const F = [['all','Wszystkie',counts.all],['today','Dziś',counts.today],['week','7 dni'],['overdue','Zaległe',counts.overdue],['nodate','Bez terminu']];
   const head = `<header class="page-head"><div class="head-row"><h1>Zadania</h1>
       <div class="seg" role="tablist"><button class="${ui.taskTab === 'list' ? 'on' : ''}" data-act="task-tab" data-v="list">${ic('list', 15)}Lista</button><button class="${ui.taskTab === 'board' ? 'on' : ''}" data-act="task-tab" data-v="board">${ic('board', 15)}Kanban</button></div></div></header>
@@ -809,7 +847,8 @@ function viewTasks() {
     </div>`;
   const addAttrs = `data-project="${ui.taskProject}" ${ui.taskFilter === 'today' ? `data-due="${t}"` : ''}`;
   if (ui.taskTab === 'board') return `<div class="page" style="max-width:1280px">${head}${boardHtml(list)}</div>`;
-  const open = list.filter(x => x.status !== 'done').sort(taskSort);
+  const open = list.filter(x => x.status !== 'done' && x.status !== 'paused').sort(taskSort);
+  const paused = list.filter(x => x.status === 'paused').sort(taskSort);
   const tm = addDays(1), we = addDays(7);
   const G = [['Zaległe', x => x.due && x.due < t, 'over'], ['Dziś', x => x.due === t], ['Jutro', x => x.due === tm], ['Najbliższe 7 dni', x => x.due > tm && x.due <= we], ['Później', x => x.due > we], ['Bez terminu', x => !x.due]];
   const groups = G.map(([name, fn, cls]) => { const items = open.filter(fn); return items.length ? `<div class="tgroup"><div class="tgroup-h ${cls || ''}"><span class="eyebrow">${name}</span><span class="count">${items.length}</span></div>${items.map(x => taskRow(x)).join('')}</div>` : ''; }).join('');
@@ -817,12 +856,13 @@ function viewTasks() {
   return `<div class="page narrow">${head}
     <div class="tlist">${addLine(addAttrs, 'Nowe zadanie, Enter zapisuje', 'tasks-add')}
       <div style="height:10px"></div>
-      ${groups || emptyBox(list.length ? 'Wszystko zrobione' : 'Brak zadań w tym widoku', list.length ? 'Ten filtr nie ma otwartych zadań.' : 'Wpisz pierwsze zadanie w polu powyżej.')}
+      ${groups || (paused.length ? '' : emptyBox(list.length ? 'Wszystko zrobione' : 'Brak zadań w tym widoku', list.length ? 'Ten filtr nie ma otwartych zadań.' : 'Wpisz pierwsze zadanie w polu powyżej.'))}
+      ${paused.length ? `<div class="tgroup" style="margin-top:18px"><div class="tgroup-h"><span class="eyebrow">${esc(L().task.paused)}</span><span class="count">${paused.length}</span></div>${paused.map(x => taskRow(x)).join('')}</div>` : ''}
       ${done.length ? `<div class="tgroup" style="margin-top:18px"><div class="tgroup-h"><span class="eyebrow">${esc(L().task.done)}</span><span class="count">${done.length}</span></div>${done.map(x => taskRow(x)).join('')}</div>` : ''}
     </div></div>`;
 }
 function boardHtml(list) {
-  return `<div class="kanban">${['todo','doing','done'].map(s => {
+  return `<div class="kanban">${['todo','doing','paused','done'].map(s => {
     let items = list.filter(t => t.status === s);
     items = s === 'done' ? items.sort((a, b) => (b.doneAt || 0) - (a.doneAt || 0)).slice(0, 30) : items.sort(taskSort);
     return `<section class="kcol" data-drop="${s}"><header class="kcol-h"><span class="kdot st-${s}"></span>${esc(L().task[s])}<span class="count">${items.length}</span></header>
@@ -911,6 +951,7 @@ function viewNote(id) {
       <div class="prop"><span class="lbl">Tagi</span><div class="tagbox">${(n.tags || []).map(t => `<span class="tag">#${esc(t)}<button data-act="tag-del" data-id="${id}" data-v="${esc(t)}" aria-label="Usuń tag ${esc(t)}">×</button></span>`).join('')}<input data-tagin="${id}" data-fk="tagin-${id}" placeholder="Dodaj tag" enterkeyhint="done" aria-label="Dodaj tag"></div></div>
       <span style="margin-left:auto; display:flex; gap:4px; align-items:center">
         <span class="muted" style="font-size:12px">Zmieniono ${esc(fmtTs(n.updatedAt))}</span>
+        <button class="iconbtn" data-act="note-mindmap" data-id="${id}" aria-label="Mapa myśli z notatki" title="Zrób mapę myśli z nagłówków i list">${ic('mind', 17)}</button>
         <button class="iconbtn" data-act="note-pin" data-id="${id}" aria-label="${n.pinned ? 'Odepnij' : 'Przypnij'}" title="${n.pinned ? 'Odepnij' : 'Przypnij'}" style="${n.pinned ? 'color:var(--accent)' : ''}">${ic('pin', 17)}</button>
         <button class="iconbtn" data-act="note-del" data-id="${id}" aria-label="Usuń notatkę" title="Usuń notatkę">${ic('trash', 17)}</button>
       </span>
@@ -923,17 +964,19 @@ function viewNote(id) {
 const BT = [
   ['p','Tekst','T'], ['h1','Nagłówek 1','H1'], ['h2','Nagłówek 2','H2'], ['h3','Nagłówek 3','H3'],
   ['ul','Lista','•'], ['ol','Lista numerowana','1.'], ['todo','Do zrobienia','☐'], ['quote','Cytat','"'],
-  ['callout','Wyróżnienie','!'], ['code','Kod','{}'], ['mermaid','Schemat (Mermaid)','◇'], ['hr','Separator','—']
+  ['callout','Wyróżnienie','!'], ['code','Kod','{}'], ['mindmap','Mapa myśli','✳'], ['mermaid','Schemat (Mermaid)','◇'], ['hr','Separator','—']
 ];
-const CODEISH = ['code','mermaid'];
-const BT_ALIAS = {p:'tekst akapit text', h1:'naglowek h1 tytul heading', h2:'naglowek h2 heading', h3:'naglowek h3 heading', ul:'lista punkty bullet', ol:'numerowana lista numbered', todo:'zadanie checklista todo check', quote:'cytat quote', callout:'wyroznienie uwaga callout', code:'kod code', mermaid:'schemat diagram mermaid wykres flowchart graf mapa', hr:'separator linia divider'};
-const PH = {p:'Wpisz / aby wybrać blok', h1:'Nagłówek 1', h2:'Nagłówek 2', h3:'Nagłówek 3', ul:'Lista', ol:'Lista', todo:'Do zrobienia', quote:'Cytat', callout:'Wyróżnienie', code:'Kod', mermaid:'Kod Mermaid, np. flowchart TD'};
+const CODEISH = ['code','mermaid','mindmap'];
+const BT_ALIAS = {p:'tekst akapit text', h1:'naglowek h1 tytul heading', h2:'naglowek h2 heading', h3:'naglowek h3 heading', ul:'lista punkty bullet', ol:'numerowana lista numbered', todo:'zadanie checklista todo check', quote:'cytat quote', callout:'wyroznienie uwaga callout', code:'kod code', mermaid:'schemat diagram mermaid wykres flowchart graf', mindmap:'mapa mysli mindmap konspekt drzewo markmap', hr:'separator linia divider'};
+const PH = {p:'Wpisz / aby wybrać blok', h1:'Nagłówek 1', h2:'Nagłówek 2', h3:'Nagłówek 3', ul:'Lista', ol:'Lista', todo:'Do zrobienia', quote:'Cytat', callout:'Wyróżnienie', code:'Kod', mermaid:'Kod Mermaid, np. flowchart TD', mindmap:'# Temat\n## Gałąź\n- punkt\n  - szczegół'};
 const CE = (() => { const d = document.createElement('div'); try { d.contentEditable = 'plaintext-only'; } catch {} return d.contentEditable === 'plaintext-only' ? 'plaintext-only' : 'true'; })();
 const nb = (type = 'p', text = '') => ({ id:uid(), type, text });
 
 function editorHtml(c, id, doc) {
   if (!Array.isArray(doc.blocks)) doc.blocks = [];
   if (!doc.blocks.length) doc.blocks.push(nb());
+  let conv = false; for (const b of doc.blocks) if (b.type === 'mermaid' && /^\s*mindmap\b/.test(b.text || '')) { b.type = 'mindmap'; b.text = mermaidToOutline(b.text); conv = true; }
+  if (conv) save(c, id, 900);
   const solo = doc.blocks.length === 1 && doc.blocks[0].type === 'p' && !doc.blocks[0].text;
   let n = 0;
   return `<div class="editor ${solo ? 'solo' : ''}" data-c="${c}" data-id="${id}">${doc.blocks.map(b => { n = b.type === 'ol' ? n + 1 : 0; return blockHtml(b, n); }).join('')}<div class="ed-tail" data-act="ed-append"></div></div>`;
@@ -942,6 +985,7 @@ function blockHtml(b, n) {
   const handle = `<button class="blk-handle" data-act="blk-menu" draggable="true" aria-label="Opcje bloku" tabindex="-1">${icn('grip', 15)}</button>`;
   if (b.type === 'hr') return `<div class="blk blk-hr" data-bid="${b.id}">${handle}<hr></div>`;
   if (b.type === 'mermaid') return mermaidBlockHtml(b, handle);
+  if (b.type === 'mindmap') return mindmapBlockHtml(b, handle);
   let pre = '', after = '', chk = false;
   if (b.type === 'ul') pre = '<span class="blk-pre bullet"></span>';
   if (b.type === 'ol') pre = `<span class="blk-pre">${n}.</span>`;
@@ -997,6 +1041,7 @@ function onEdInput(el) {
   touchDoc(x.c, x.id);
   x.ed.classList.remove('solo');
   if (x.b.type === 'mermaid') { scheduleMermaid(x.blkEl, x.b); return; }
+  if (x.b.type === 'mindmap') { scheduleMindmap(x.blkEl, x.b); return; }
   if (x.b.text === '---' && x.b.type !== 'code') {
     x.b.type = 'hr'; x.b.text = ''; const nx = nb(); x.blocks.splice(x.i + 1, 0, nx); rerenderEditor(x, nx.id, 0); return;
   }
@@ -1145,17 +1190,7 @@ const MM_TPL = [
   section Realizacja
   Zdjęcia :b1, after a2, 2d
   Montaż :b2, after b1, 6d`],
-  ['mind', 'Mapa myśli', `mindmap
-  root((Projekt))
-    Ludzie
-      Reżyser
-      Operator
-    Miejsca
-      Studio
-      Plener
-    Budżet
-      Sprzęt
-      Honoraria`],
+  ['mind', 'Mapa myśli', null],
   ['state', 'Diagram stanów', `stateDiagram-v2
   [*] --> Pomysł
   Pomysł --> W_toku: start
@@ -1169,9 +1204,26 @@ const MM_TPL = [
   B -- "ukrywa sekret przed" --> A
   D(["Mentor"]) -. "chroni" .-> A`]
 ];
-const mmMode = new Map(), mmCache = new Map(), mmLast = new Map(), mmErr = new Map(), mmTimers = {}, mmAbort = new Map();
-let mmLib = null, mmLoading = null, smp = null;
+const MK_TPL = `# Projekt
+## Ludzie
+- Reżyser
+- Operator
+  - Ostrość
+  - Światło
+## Miejsca
+- Studio
+- Plener
+## Budżet
+- Sprzęt
+- Honoraria
+## Terminy
+- Zdjęcia
+- Montaż`;
+const mmMode = new Map(), mmCache = new Map(), mmLast = new Map(), mmErr = new Map(), mmTimers = {}, mmAbort = new Map(), mmView = new Map(), mkLevel = new Map();
+let mmLib = null, mmLoading = null, smp = null, mkLoading = null;
 const wideScreen = () => innerWidth > 820;
+const ELK_URL = 'https://cdn.jsdelivr.net/npm/@mermaid-js/layout-elk@0.1.7/dist/mermaid-layout-elk.esm.min.mjs';
+let elkReady = false;
 function hexMix(a, b, t) {
   const p = h => { h = (h || '#888888').trim().replace('#', ''); if (h.length === 3) h = h.split('').map(x => x + x).join(''); const n = parseInt(h.slice(0, 6), 16); return [n >> 16 & 255, n >> 8 & 255, n & 255]; };
   const A = p(a), B = p(b); return '#' + A.map((v, i) => Math.round(v * (1 - t) + B[i] * t).toString(16).padStart(2, '0')).join('');
@@ -1194,51 +1246,86 @@ function mmTheme() {
 let mmSig = '';
 function mmInit() {
   const { tv, sig } = mmTheme(); mmSig = sig;
+  const dark = tv.darkMode;
+  const shadow = dark ? 'rgba(0,0,0,.45)' : 'rgba(20,30,25,.13)';
   mmLib.initialize({ startOnLoad:false, securityLevel:'strict', theme:'base', themeVariables:tv, fontFamily:tv.fontFamily, htmlLabels:false,
-    flowchart:{ htmlLabels:false, curve:'basis', padding:14 }, sequence:{ useMaxWidth:true },
+    flowchart:{ htmlLabels:false, curve:'basis', padding:16, nodeSpacing:48, rankSpacing:58, diagramPadding:12 },
+    state:{ padding:12 }, sequence:{ useMaxWidth:true, actorMargin:56, boxMargin:12, messageMargin:40 },
     gantt:{ useMaxWidth:true, useWidth:720, barHeight:26, barGap:6, fontSize:13, sectionFontSize:13, leftPadding:100, topPadding:44, gridLineStartPadding:36 },
-    timeline:{ useMaxWidth:true }, mindmap:{ padding:14 } });
+    timeline:{ useMaxWidth:true }, mindmap:{ padding:14 },
+    themeCSS:`
+      .node rect, .node polygon, .node circle, .node ellipse, .node path, .actor, .statediagram-state rect, rect.task { filter: drop-shadow(0 1px 2px ${shadow}); }
+      .node rect, .statediagram-state rect, .cluster rect { rx: 10px; ry: 10px; }
+      .flowchart-link, .edgePath .path, .transition { stroke-width: 1.7px !important; }
+      .edgeLabel, .edgeLabel rect { font-size: 13px; }
+      .nodeLabel, .label text, .node text { font-weight: 500; }
+      .cluster-label text, .titleText, .sectionTitle { font-weight: 600; }
+    ` });
+}
+async function loadElk() {
+  if (elkReady || !mmLib?.registerLayoutLoaders) return elkReady;
+  try { const mod = await import(ELK_URL); mmLib.registerLayoutLoaders(mod.default); elkReady = true; } catch { elkReady = false; }
+  return elkReady;
 }
 function loadMermaid() {
   if (mmLib) return Promise.resolve(mmLib);
   if (!mmLoading) mmLoading = new Promise((res, rej) => {
     const sc = document.createElement('script');
     sc.src = 'https://cdn.jsdelivr.net/npm/mermaid@11.4.1/dist/mermaid.min.js';
-    sc.onload = () => { if (!window.mermaid) { mmLoading = null; rej(new Error('load')); return; } mmLib = window.mermaid; mmInit(); res(mmLib); };
+    sc.onload = async () => { if (!window.mermaid) { mmLoading = null; rej(new Error('load')); return; } mmLib = window.mermaid; mmInit(); await loadElk(); res(mmLib); };
     sc.onerror = () => { mmLoading = null; rej(new Error('load')); };
     document.head.appendChild(sc);
   });
   return mmLoading;
 }
 function mmRefreshTheme() {
+  refreshMindmaps();
   if (!mmLib) return; const { sig } = mmTheme(); if (sig === mmSig) return;
   mmInit(); mmCache.clear(); document.querySelectorAll('.mm-prev[data-bid]').forEach(p => p.dataset.pending = '1'); renderMermaids(document);
 }
+const LAYOUT_RE = /^\s*(flowchart|graph|stateDiagram|classDiagram|erDiagram)\b/;
+const LOOK_RE = /^\s*(flowchart|graph|stateDiagram)\b/;
+function mmEff(b) {
+  const code = b.text || ''; if (/^\s*---/.test(code)) return code;
+  const layout = b.layout || 'elk', look = b.look || 'classic';
+  const lines = [];
+  if (LAYOUT_RE.test(code) && layout === 'elk' && elkReady) lines.push('  layout: elk');
+  if (LOOK_RE.test(code) && look === 'handDrawn') lines.push('  look: handDrawn');
+  return lines.length ? `---\nconfig:\n${lines.join('\n')}\n---\n${code}` : code;
+}
 const mmKey = code => mmSig + '§' + code;
+const ctrlsHtml = (kind) => `<div class="mm-ctrls" role="group" aria-label="Widok">
+  <button data-act="${kind}-zoom" data-v="out" aria-label="Pomniejsz" title="Pomniejsz" tabindex="-1">${ic('minus', 15)}</button>
+  <button data-act="${kind}-zoom" data-v="in" aria-label="Powiększ" title="Powiększ" tabindex="-1">${ic('plus', 15)}</button>
+  <button data-act="${kind}-zoom" data-v="fit" aria-label="Dopasuj" title="Dopasuj do okna" tabindex="-1">${ic('target', 15)}</button>
+  <button data-act="mm-full" aria-label="Pełny ekran" title="Pełny ekran (Esc zamyka)" tabindex="-1">${ic('expand', 15)}</button></div>`;
+const modeSeg = (b, mode) => `<div class="seg">${[['prev','Podgląd'], ['split','Obok'], ['code','Kod']].map(([k, l]) => `<button class="${mode === k ? 'on' : ''}" data-act="mm-mode" data-v="${k}" tabindex="-1">${l}</button>`).join('')}</div>`;
+const aiBox = (b, isMap) => { const has = (b.text || '').trim(); return `<div class="mm-ai" hidden><textarea class="in mm-ask" rows="2" placeholder="${isMap ? (has ? 'Co zmienić w mapie? Np. rozbuduj gałąź Budżet o konkretne pozycje' : 'Jaki temat ma mieć mapa? Np. świat przedstawiony serialu: postacie, miejsca, konflikty') : (has ? 'Co zmienić w schemacie? Np. dodaj etap kolorkorekcji po montażu' : 'Co ma pokazać schemat? Np. struktura odcinka w pięciu aktach z punktami zwrotnymi')}" aria-label="Opis"></textarea>
+  <div class="btnrow"><button class="btn sm primary" data-act="mm-gen">${has ? (isMap ? 'Zmień mapę' : 'Zmień schemat') : (isMap ? 'Generuj mapę' : 'Generuj schemat')}</button><button class="btn sm" data-act="mm-stop" hidden>Zatrzymaj</button><span class="mm-status"></span><span class="spacer"></span><span class="mm-status">Ctrl+Enter</span></div></div>`; };
 function mermaidBlockHtml(b, handle) {
   const code = b.text || '';
   const mode = mmMode.get(b.id) || (code.trim() ? 'prev' : (wideScreen() ? 'split' : 'prev'));
-  const cached = code.trim() && (mmCache.get(mmKey(code)) || mmLast.get(b.id));
+  const key = mmKey(mmEff(b));
+  const cached = code.trim() && (mmCache.get(key) || mmLast.get(b.id));
   const err = mmErr.get(b.id);
-  const prev = !code.trim()
+  const inner = !code.trim()
     ? `<div class="mm-tpls"><p>Wybierz szablon, wpisz kod${smp ? ' albo opisz schemat słowami' : ''}.</p><div class="chips">${MM_TPL.map(([k, l]) => `<button class="chip" data-act="mm-tpl-pick" data-v="${k}">${esc(l)}</button>`).join('')}</div>
        <div class="chips">${smp ? `<button class="btn sm primary" data-act="mm-ai">${ic('bulb', 15)}Opisz słowami</button>` : ''}<button class="btn sm" data-act="mm-mode" data-v="${wideScreen() ? 'split' : 'code'}">Pisz kod</button></div></div>`
     : (cached || `<span class="mm-wait">Rysuję schemat…</span>`);
   return `<div class="blk blk-mermaid" data-bid="${b.id}">${handle}<div class="mm">
-    <div class="mm-bar"><span class="tag-l">${ic('board', 13)}Schemat</span>
-      <div class="seg">${[['prev','Podgląd'], ['split','Obok'], ['code','Kod']].map(([k, l]) => `<button class="${mode === k ? 'on' : ''}" data-act="mm-mode" data-v="${k}" tabindex="-1">${l}</button>`).join('')}</div>
+    <div class="mm-bar"><span class="tag-l">${ic('board', 13)}Schemat</span>${modeSeg(b, mode)}
       <span class="spacer"></span>
       <button class="btn sm ghost" data-act="mm-tpl" tabindex="-1">Szablony</button>
+      ${code.trim() && (LAYOUT_RE.test(code) || LOOK_RE.test(code)) ? `<button class="btn sm ghost" data-act="mm-style" tabindex="-1">Styl</button>` : ''}
       ${smp ? `<button class="btn sm ghost" data-act="mm-ai" tabindex="-1">${ic('bulb', 14)}Opisz słowami</button>` : ''}
       ${code.trim() ? `<button class="btn sm ghost" data-act="mm-svg" tabindex="-1" title="Zapisz jako SVG">SVG</button><button class="btn sm ghost" data-act="mm-png" tabindex="-1" title="Zapisz jako PNG">PNG</button>` : ''}
     </div>
     <div class="mm-body mode-${mode}">
       <div class="mm-code"><div class="bt mm-src" contenteditable="${CE}" spellcheck="false" data-ph="${PH.mermaid}">${esc(code)}${code.endsWith('\n') ? '​' : ''}</div></div>
-      <div class="mm-prev" data-bid="${b.id}" ${code.trim() && !mmCache.get(mmKey(code)) ? 'data-pending="1"' : ''}>${prev}</div>
+      <div class="mm-prev" data-bid="${b.id}" ${code.trim() && !mmCache.get(key) ? 'data-pending="1"' : ''}><div class="mm-stage">${inner}</div>${code.trim() ? ctrlsHtml('mm') : ''}</div>
     </div>
     <div class="mm-err" ${err && code.trim() ? '' : 'hidden'}><code>${esc(err || '')}</code>${smp ? `<button class="btn sm" data-act="mm-fix" tabindex="-1">Popraw z Claude</button>` : ''}</div>
-    <div class="mm-ai" hidden><textarea class="in mm-ask" rows="2" placeholder="${code.trim() ? 'Co zmienić w schemacie? Np. dodaj etap kolorkorekcji po montażu' : 'Co ma pokazać schemat? Np. struktura odcinka w pięciu aktach z punktami zwrotnymi'}" aria-label="Opis schematu"></textarea>
-      <div class="btnrow"><button class="btn sm primary" data-act="mm-gen">${code.trim() ? 'Zmień schemat' : 'Generuj schemat'}</button><button class="btn sm" data-act="mm-stop" hidden>Zatrzymaj</button><span class="mm-status"></span><span class="spacer"></span><span class="mm-status">Ctrl+Enter</span></div></div>
+    ${aiBox(b, false)}
   </div></div>`;
 }
 function setMmErr(blkEl, bid, msg) {
@@ -1250,28 +1337,34 @@ function mmErrText(e) {
   const raw = String(e?.message || e?.str || e || 'Nieznany błąd').split('\n').filter(l => l.trim()).slice(0, 3).join('\n');
   return 'Błąd w kodzie schematu: ' + raw;
 }
+function setStage(prev, html) { const st = prev.querySelector('.mm-stage'); if (st) st.innerHTML = html; else prev.innerHTML = `<div class="mm-stage">${html}</div>`; applyView(prev); }
 async function renderMermaidEl(prev) {
   const blkEl = prev.closest('.blk'); const x = edCtx(prev); if (!x || !x.b) return;
   const code = x.b.text || ''; delete prev.dataset.pending;
   if (!code.trim()) return;
-  try { await loadMermaid(); } catch { prev.innerHTML = `<span class="mm-wait">Nie udało się wczytać modułu schematów. Sprawdź połączenie i odśwież stronę.</span>`; return; }
-  const key = mmKey(code);
-  if (mmCache.has(key)) { prev.innerHTML = mmCache.get(key); setMmErr(blkEl, x.b.id, null); return; }
+  try { await loadMermaid(); } catch { setStage(prev, `<span class="mm-wait">Nie udało się wczytać modułu schematów. Sprawdź połączenie i odśwież stronę.</span>`); return; }
+  const eff = mmEff(x.b), key = mmKey(eff);
+  if (mmCache.has(key)) { setStage(prev, mmCache.get(key)); setMmErr(blkEl, x.b.id, null); return; }
   try {
-    await mmLib.parse(code);
+    await mmLib.parse(eff);
     const id = 'mmd' + uid();
-    const { svg } = await mmLib.render(id, code);
+    const { svg } = await mmLib.render(id, eff);
     document.getElementById('d' + id)?.remove();
     mmCache.set(key, svg); mmLast.set(x.b.id, svg);
     if (mmCache.size > 120) mmCache.delete(mmCache.keys().next().value);
-    if (prev.isConnected && (getDoc(x.c, x.id)?.blocks.find(b => b.id === x.b.id)?.text || '') === code) { prev.innerHTML = svg; setMmErr(blkEl, x.b.id, null); }
+    const cur = getDoc(x.c, x.id)?.blocks.find(b => b.id === x.b.id);
+    if (prev.isConnected && cur && mmEff(cur) === eff) { setStage(prev, svg); setMmErr(blkEl, x.b.id, null); }
   } catch (e) {
     document.querySelectorAll('body > [id^="dmmd"], body > svg[id^="mmd"]').forEach(n => n.remove());
     setMmErr(blkEl, x.b.id, mmErrText(e));
-    if (!mmLast.get(x.b.id) && prev.isConnected) prev.innerHTML = `<span class="mm-wait">Popraw kod, a podgląd pojawi się tutaj.</span>`;
+    if (!mmLast.get(x.b.id) && prev.isConnected) setStage(prev, `<span class="mm-wait">Popraw kod, a podgląd pojawi się tutaj.</span>`);
   }
 }
-function renderMermaids(root) { (root || document).querySelectorAll('.mm-prev[data-pending]').forEach(p => { renderMermaidEl(p); }); }
+function renderMermaids(root) {
+  (root || document).querySelectorAll('.mm-prev[data-pending]').forEach(p => { renderMermaidEl(p); });
+  (root || document).querySelectorAll('.mm-prev[data-bid]').forEach(applyView);
+  renderMindmaps(root);
+}
 function scheduleMermaid(blkEl, b) {
   clearTimeout(mmTimers[b.id]);
   mmTimers[b.id] = setTimeout(() => {
@@ -1280,6 +1373,224 @@ function scheduleMermaid(blkEl, b) {
     prev.dataset.pending = '1'; renderMermaidEl(prev);
   }, 450);
 }
+function mmStyleMenu(btn) {
+  const x = edCtx(btn); if (!x) return; const b = x.b;
+  const lay = b.layout || 'elk', look = b.look || 'classic';
+  const row = (act, v, on, label, hint) => `<button class="pop-i ${on ? 'on' : ''}" data-act="${act}" data-v="${v}">${on ? ic('check', 15) : '<span style="width:15px"></span>'}<span><span style="display:block">${label}</span><span class="muted" style="font-size:12px">${hint}</span></span></button>`;
+  openPop(btn, `${LAYOUT_RE.test(b.text) ? `<div class="pop-l eyebrow">Układ</div>${row('mm-layout', 'elk', lay === 'elk', 'Uporządkowany (ELK)', elkReady ? 'mniej krzyżujących się linii' : 'wczytuje się przy pierwszym użyciu')}${row('mm-layout', 'dagre', lay === 'dagre', 'Standardowy', 'klasyczny układ Mermaid')}` : ''}
+    ${LOOK_RE.test(b.text) ? `<div class="pop-sep"></div><div class="pop-l eyebrow">Wygląd</div>${row('mm-look', 'classic', look === 'classic', 'Klasyczny', 'czyste linie i zaokrąglenia')}${row('mm-look', 'handDrawn', look === 'handDrawn', 'Szkic', 'odręczny styl, dobry do koncepcji')}` : ''}`,
+    { kind:'block', c:x.c, id:x.id, bid:b.id });
+}
+
+async function await_elk(x) {
+  const bid = x.b.id; toast('Wczytuję uporządkowany układ…');
+  try { await loadMermaid(); await loadElk(); } catch {}
+  if (!elkReady) toast('Nie udało się wczytać układu ELK. Zostaje układ standardowy.');
+  const blk = document.querySelector(`.blk[data-bid="${bid}"]`); if (blk) rerenderEditor(edCtx(blk));
+}
+
+/* pan & zoom for mermaid previews */
+function applyView(prev) {
+  const v = mmView.get(prev.dataset.bid); const st = prev.querySelector('.mm-stage'); if (!st) return;
+  const on = v && (v.s !== 1 || v.x || v.y);
+  st.style.transform = on ? `translate(${v.x}px, ${v.y}px) scale(${v.s})` : '';
+  prev.classList.toggle('zoomed', !!on);
+}
+function zoomAt(prev, factor, cx, cy) {
+  const bid = prev.dataset.bid, v = { ...(mmView.get(bid) || { s:1, x:0, y:0 }) };
+  if (cx == null) { const r = prev.getBoundingClientRect(); cx = r.width / 2; cy = r.height / 2; }
+  const ns = Math.min(6, Math.max(.3, v.s * factor));
+  v.x = cx - (cx - v.x) * ns / v.s; v.y = cy - (cy - v.y) * ns / v.s; v.s = ns;
+  mmView.set(bid, v); applyView(prev);
+}
+document.addEventListener('wheel', e => {
+  const prev = e.target.closest?.('.mm-prev'); if (!prev || !prev.querySelector('svg')) return;
+  const full = !!prev.closest('.mm.full');
+  if (!full && !e.ctrlKey && !e.metaKey) return;
+  e.preventDefault(); const r = prev.getBoundingClientRect();
+  zoomAt(prev, Math.exp(-e.deltaY * (e.ctrlKey && !full ? .01 : .0015)), e.clientX - r.left, e.clientY - r.top);
+}, { passive:false });
+let panState = null;
+document.addEventListener('pointerdown', e => {
+  const prev = e.target.closest?.('.mm-prev'); if (!prev || e.target.closest('.mm-ctrls, button')) return;
+  if (!prev.classList.contains('zoomed') && !prev.closest('.mm.full')) return;
+  if (!panState || panState.prev !== prev) panState = { prev, pts:new Map() };
+  panState.pts.set(e.pointerId, { x:e.clientX, y:e.clientY });
+  prev.setPointerCapture?.(e.pointerId); prev.classList.add('panning');
+});
+document.addEventListener('pointermove', e => {
+  if (!panState || !panState.pts.has(e.pointerId)) return;
+  const { prev, pts } = panState; const bid = prev.dataset.bid; const v = { ...(mmView.get(bid) || { s:1, x:0, y:0 }) };
+  const old = pts.get(e.pointerId);
+  if (pts.size === 1) { v.x += e.clientX - old.x; v.y += e.clientY - old.y; mmView.set(bid, v); applyView(prev); }
+  else if (pts.size === 2) {
+    const other = [...pts.entries()].find(([id]) => id !== e.pointerId)[1];
+    const d0 = Math.hypot(old.x - other.x, old.y - other.y), d1 = Math.hypot(e.clientX - other.x, e.clientY - other.y);
+    const r = prev.getBoundingClientRect(); if (d0 > 0) zoomAt(prev, d1 / d0, (e.clientX + other.x) / 2 - r.left, (e.clientY + other.y) / 2 - r.top);
+  }
+  pts.set(e.pointerId, { x:e.clientX, y:e.clientY });
+});
+const endPan = e => { if (!panState) return; panState.pts.delete(e.pointerId); if (!panState.pts.size) { panState.prev.classList.remove('panning'); panState = null; } };
+document.addEventListener('pointerup', endPan); document.addEventListener('pointercancel', endPan);
+function toggleFull(blk, force) {
+  const mm = blk.querySelector('.mm'); if (!mm) return;
+  const on = force ?? !mm.classList.contains('full');
+  document.querySelectorAll('.mm.full').forEach(m => { if (m !== mm) m.classList.remove('full'); });
+  mm.classList.toggle('full', on); document.body.classList.toggle('mm-fs', on);
+  const prev = mm.querySelector('.mm-prev'); if (prev) { mmView.delete(prev.dataset.bid); applyView(prev); }
+  const mk = mm.querySelector('.mk-prev');
+  if (mk?._mk) { mk._mk.setOptions({ zoom:on, pan:on }); setTimeout(() => { try { if (mk.isConnected && mk.offsetWidth) mk._mk.fit(); } catch {} }, 60); }
+  const btn = mm.querySelector('[data-act="mm-full"]'); if (btn) { btn.innerHTML = ic(on ? 'shrink' : 'expand', 15); btn.title = on ? 'Zamknij pełny ekran (Esc)' : 'Pełny ekran (Esc zamyka)'; }
+}
+
+/* ---------- mind maps (markmap) ---------- */
+function loadMarkmap() {
+  if (window.markmap?.Markmap) return Promise.resolve(window.markmap);
+  if (!mkLoading) mkLoading = (async () => {
+    if (!window.d3) await loadScript('https://cdnjs.cloudflare.com/ajax/libs/d3/7.9.0/d3.min.js');
+    await loadScript('https://cdn.jsdelivr.net/npm/markmap-view@0.18.12/dist/browser/index.js');
+    if (!window.markmap?.Markmap) throw new Error('markmap');
+    return window.markmap;
+  })().catch(e => { mkLoading = null; throw e; });
+  return mkLoading;
+}
+const mdInl = s => esc(s).replace(/\*\*(.+?)\*\*/g, '<b>$1</b>').replace(/(^|[^*])\*([^*\s][^*]*)\*/g, '$1<i>$2</i>').replace(/`([^`]+)`/g, '<code>$1</code>');
+const stripMd = s => String(s).replace(/\*\*(.+?)\*\*/g, '$1').replace(/\*([^*]+)\*/g, '$1').replace(/`([^`]+)`/g, '$1');
+function outlineItems(text) {
+  const items = []; let headL = 0;
+  for (const raw of String(text || '').replace(/\t/g, '  ').split('\n')) {
+    if (!raw.trim()) continue; let m;
+    if ((m = raw.match(/^\s*(#{1,6})\s+(.*)$/))) { headL = m[1].length; items.push({ L:headL, t:m[2].trim() }); continue; }
+    const ind = raw.match(/^\s*/)[0].length;
+    m = raw.match(/^\s*(?:[-*+]|\d+[.)])\s+(?:\[[ xX]\]\s+)?(.*)$/);
+    const t = (m ? m[1] : raw.trim()).trim(); if (t) items.push({ L:headL + 1 + Math.floor(ind / 2), t });
+  }
+  return items;
+}
+function outlineTree(text, fallbackTitle) {
+  const items = outlineItems(text); if (!items.length) return null;
+  const root = { content:'', raw:'', children:[], payload:{} }; const stack = [{ L:0, node:root }];
+  for (const it of items) {
+    const node = { content:'', raw:it.t, children:[], payload:{} };
+    while (stack.length > 1 && stack[stack.length - 1].L >= it.L) stack.pop();
+    stack[stack.length - 1].node.children.push(node); stack.push({ L:it.L, node });
+  }
+  const top = root.children.length === 1 ? root.children[0] : Object.assign(root, { raw:fallbackTitle || 'Mapa myśli' });
+  const tag = (n, d, br) => {
+    n.payload.branch = br; n.payload.depth = d;
+    const html = mdInl(n.raw);
+    n.content = d === 0 ? `<span style="font-weight:700;font-size:1.22em;letter-spacing:-.01em">${html}</span>` : d === 1 ? `<span style="font-weight:600">${html}</span>` : html;
+    n.children.forEach((c, i) => tag(c, d + 1, d === 0 ? i : br));
+  };
+  tag(top, 0, null); return top;
+}
+function mkPalette() {
+  const cs = getComputedStyle(document.documentElement), s = cs.getPropertyValue('--surface').trim() || '#ffffff';
+  const dark = lum(s) < .4;
+  const pal = [cs.getPropertyValue('--accent').trim() || '#2E55D4', ...PCOLORS.filter(c => c !== '#6B7280' && c !== '#3B6FE0')].map(c => dark ? hexMix(c, '#ffffff', .18) : hexMix(c, '#000000', .05));
+  return { pal, root:cs.getPropertyValue('--muted').trim() || '#666', text:cs.getPropertyValue('--text').trim(), surface:s, font:cs.getPropertyValue('--f-body').trim() };
+}
+function mkOpts(bid, full) {
+  const P = mkPalette();
+  return { autoFit:false, duration:380, maxWidth:300, paddingX:10, spacingHorizontal:72, spacingVertical:9, nodeMinHeight:18, fitRatio:.92, maxInitialScale:1.6,
+    initialExpandLevel:mkLevel.has(bid) ? mkLevel.get(bid) : -1, zoom:!!full, pan:!!full, scrollForPan:false, toggleRecursively:false,
+    color:n => n.payload?.branch == null ? P.root : P.pal[n.payload.branch % P.pal.length],
+    lineWidth:n => Math.max(1.4, 4.4 - (n.state?.depth || 0) * 1) };
+}
+function styleMkSvg(svg) {
+  const P = mkPalette();
+  svg.style.setProperty('--markmap-font', `400 14.5px/20px ${P.font}`);
+  svg.style.setProperty('--markmap-text-color', P.text);
+  svg.style.setProperty('--markmap-circle-open-bg', P.surface);
+  svg.style.setProperty('--markmap-code-bg', 'transparent');
+  svg.style.setProperty('--markmap-code-color', P.text);
+  svg.style.color = P.text;
+}
+function mindmapBlockHtml(b, handle) {
+  const code = b.text || '';
+  const mode = mmMode.get(b.id) || (code.trim() ? 'prev' : (wideScreen() ? 'split' : 'prev'));
+  const lvl = mkLevel.has(b.id) ? mkLevel.get(b.id) : -1;
+  const inner = code.trim() ? `<svg class="mk-svg" aria-label="Mapa myśli"></svg>${ctrlsHtml('mk')}`
+    : `<div class="mm-tpls" style="padding:16px"><p>Napisz konspekt: <code># temat</code>, <code>## gałęzie</code>, <code>- punkty</code> (wcięcie = poziom niżej)${smp ? ' albo opisz mapę słowami' : ''}.</p>
+       <div class="chips"><button class="chip" data-act="mk-sample">Przykładowa mapa</button>${smp ? `<button class="btn sm primary" data-act="mm-ai">${ic('bulb', 15)}Opisz słowami</button>` : ''}<button class="btn sm" data-act="mm-mode" data-v="${wideScreen() ? 'split' : 'code'}">Pisz konspekt</button></div></div>`;
+  return `<div class="blk blk-mindmap" data-bid="${b.id}">${handle}<div class="mm">
+    <div class="mm-bar"><span class="tag-l">${ic('mind', 13)}Mapa myśli</span>${modeSeg(b, mode)}
+      <span class="spacer"></span>
+      ${code.trim() ? `<div class="seg"><button class="${lvl === 1 ? 'on' : ''}" data-act="mk-fold" data-v="1" tabindex="-1">Zwiń</button><button class="${lvl === 2 ? 'on' : ''}" data-act="mk-fold" data-v="2" tabindex="-1">2 poziomy</button><button class="${lvl === -1 ? 'on' : ''}" data-act="mk-fold" data-v="-1" tabindex="-1">Całość</button></div>` : ''}
+      ${smp ? `<button class="btn sm ghost" data-act="mm-ai" tabindex="-1">${ic('bulb', 14)}Opisz słowami</button>` : ''}
+      ${code.trim() ? `<button class="btn sm ghost" data-act="mm-svg" tabindex="-1" title="Zapisz jako SVG">SVG</button><button class="btn sm ghost" data-act="mm-png" tabindex="-1" title="Zapisz jako PNG">PNG</button>` : ''}
+    </div>
+    <div class="mm-body mode-${mode}">
+      <div class="mm-code"><div class="bt mm-src" contenteditable="${CE}" spellcheck="false" data-ph="${esc(PH.mindmap)}">${esc(code)}${code.endsWith('\n') ? '​' : ''}</div></div>
+      <div class="mk-prev" data-bid="${b.id}">${inner}</div>
+    </div>
+    ${aiBox(b, true)}
+  </div></div>`;
+}
+async function renderMindmapEl(prev, fit = true) {
+  const x = edCtx(prev); if (!x || !x.b) return;
+  const svg = prev.querySelector('svg.mk-svg'); if (!svg) return;
+  if (!prev.offsetWidth) return;
+  let lib; try { lib = await loadMarkmap(); } catch { prev.innerHTML = `<span class="mm-wait" style="padding:16px">Nie udało się wczytać modułu map myśli. Sprawdź połączenie i odśwież stronę.</span>`; return; }
+  if (!prev.isConnected || !prev.offsetWidth || !svg.isConnected) return;
+  const tree = outlineTree(x.b.text, x.doc.title || x.doc.name); if (!tree) return;
+  styleMkSvg(svg);
+  const full = !!prev.closest('.mm.full');
+  try {
+    if (!prev._mk) { prev._mk = lib.Markmap.create(svg, mkOpts(x.b.id, full)); }
+    else prev._mk.setOptions(mkOpts(x.b.id, full));
+    await prev._mk.setData(tree);
+    if (fit && prev.isConnected && prev.offsetWidth) await prev._mk.fit();
+  } catch {}
+}
+function renderMindmaps(root) { (root || document).querySelectorAll('.mk-prev[data-bid]').forEach(p => { if (!p._mk) renderMindmapEl(p); }); }
+function refreshMindmaps() { document.querySelectorAll('.mk-prev[data-bid]').forEach(p => { if (p._mk) renderMindmapEl(p, false); }); }
+function scheduleMindmap(blkEl, b) {
+  clearTimeout(mmTimers[b.id]);
+  mmTimers[b.id] = setTimeout(() => {
+    const prev = document.querySelector(`.mk-prev[data-bid="${b.id}"]`); if (!prev) return;
+    if (!b.text.trim()) return;
+    if (!prev.querySelector('svg.mk-svg')) { prev.innerHTML = `<svg class="mk-svg" aria-label="Mapa myśli"></svg>${ctrlsHtml('mk')}`; prev._mk = null; }
+    renderMindmapEl(prev, true);
+  }, 320);
+}
+function mermaidToOutline(code) {
+  const lines = String(code).split('\n').slice(1).filter(l => l.trim() && !/^\s*(::icon|%%)/.test(l));
+  if (!lines.length) return '';
+  const indOf = l => l.match(/^\s*/)[0].replace(/\t/g, '  ').length;
+  const inds = [...new Set(lines.map(indOf))].sort((a, b) => a - b);
+  return lines.map(l => {
+    let t = l.trim().replace(/:::.*$/, '').trim();
+    const m = t.match(/^[^\s()[\]{}]*\s*(\(\(|\)\)|\{\{|\(|\)|\[)([\s\S]*?)(\)\)|\(\(|\}\}|\)|\(|\])$/); if (m) t = m[2];
+    t = t.replace(/^["'`]+|["'`]+$/g, '').trim();
+    const L = inds.indexOf(indOf(l));
+    return L === 0 ? '# ' + t : '  '.repeat(L - 1) + '- ' + t;
+  }).join('\n');
+}
+function outlineToMermaid(text, title) {
+  const tree = outlineTree(text, title); if (!tree) return 'mindmap';
+  const clean = s => stripMd(s).replace(/[()[\]{}]/g, ' ').replace(/\s+/g, ' ').trim() || '…';
+  const out = ['mindmap', `  root((${clean(tree.raw)}))`];
+  const walk = (n, d) => n.children.forEach(c => { out.push('  '.repeat(d + 2) + clean(c.raw)); walk(c, d + 1); });
+  walk(tree, 0); return out.join('\n');
+}
+function noteToOutline(doc) {
+  const lines = ['# ' + (doc.title || doc.name || 'Notatka').trim()]; let n = 0;
+  for (const b of doc.blocks || []) {
+    const t = (b.text || '').replace(/\n+/g, ' ').trim(); if (!t) continue;
+    if (b.type === 'h1' || b.type === 'h2') { lines.push('## ' + t); n++; }
+    else if (b.type === 'h3') { lines.push('### ' + t); n++; }
+    else if (['ul', 'ol', 'todo', 'callout', 'quote'].includes(b.type)) { lines.push('- ' + t.slice(0, 120)); n++; }
+    else if (b.type === 'p' && t.length <= 90) { lines.push('- ' + t); n++; }
+  }
+  return n ? lines.join('\n') : null;
+}
+
+const MK_RULES = `Tworzysz mapę myśli jako konspekt Markdown. Zasady:
+- Odpowiedz WYŁĄCZNIE konspektem, bez bloku \`\`\` i bez komentarzy przed ani po.
+- Pierwsza linia: "# " i temat główny. Główne gałęzie: "## ". Szczegóły: listy "- " pod gałęzią, kolejne poziomy wcięte o 2 spacje.
+- Krótkie hasła (najlepiej 1–5 słów), po polsku. 4–7 głównych gałęzi, łącznie najwyżej ok. 45 elementów.
+- Bez numeracji, bez linków, bez pogrubień.`;
 function cleanMermaid(t) {
   const m = String(t).match(/```(?:mermaid)?[^\n]*\n([\s\S]*?)(?:```|$)/); let code = (m ? m[1] : String(t)).trim();
   code = code.replace(/^%%\{init[\s\S]*?\}%%\s*/i, '');
@@ -1291,8 +1602,8 @@ async function mmGenerate(x, mode) {
   const blkEl = x.blkEl, bid = x.b.id, c = x.c, id = x.id;
   const ask = blkEl.querySelector('.mm-ask')?.value.trim() || '';
   if (mode === 'new' && !ask) { blkEl.querySelector('.mm-ask')?.focus(); toast('Opisz, co ma pokazać schemat.'); return; }
-  const cur = (x.b.text || '').trim(), title = x.doc.title || x.doc.name || '';
-  const RULES = `Jesteś generatorem diagramów Mermaid (wersja 11). Zasady:
+  const cur = (x.b.text || '').trim(), title = x.doc.title || x.doc.name || ''; const isMap = x.b.type === 'mindmap';
+  const RULES = isMap ? MK_RULES : `Jesteś generatorem diagramów Mermaid (wersja 11). Zasady:
 - Odpowiedz WYŁĄCZNIE kodem Mermaid jednego diagramu: bez bloku \`\`\`, bez komentarzy przed ani po kodzie.
 - Etykiety po polsku. Każdą etykietę ze spacją, polskimi znakami, nawiasami, dwukropkiem lub przecinkiem ujmij w podwójny cudzysłów, np. A["Scena 1: przyjazd"].
 - Wybierz najlepszy typ: flowchart, sequenceDiagram, timeline, gantt, mindmap, stateDiagram-v2, erDiagram, journey, pie albo quadrantChart. W mindmap i timeline nie używaj cudzysłowów.
@@ -1300,7 +1611,7 @@ async function mmGenerate(x, mode) {
 - Najwyżej ok. 40 elementów, czytelny układ, krótkie etykiety.`;
   const prompt = mode === 'fix'
     ? `${RULES}\n\nPoniższy kod Mermaid ma błąd składni. Popraw go, zachowując treść i układ.\n\nKomunikat błędu:\n${mmErr.get(bid) || ''}\n\nKod:\n${cur}`
-    : `${RULES}\n\n${title ? `Kontekst: notatka „${title}”.\n\n` : ''}${cur ? `Obecny kod schematu (zmodyfikuj go zgodnie z prośbą; zacznij od nowa tylko jeśli prośba tego wymaga):\n${cur}\n\n` : ''}Prośba:\n${ask}`;
+    : `${RULES}\n\n${title ? `Kontekst: notatka „${title}”.\n\n` : ''}${cur ? `${isMap ? 'Obecna mapa (konspekt)' : 'Obecny kod schematu'} (zmodyfikuj go zgodnie z prośbą; zacznij od nowa tylko jeśli prośba tego wymaga):\n${cur}\n\n` : ''}Prośba:\n${ask}`;
   const ctl = new AbortController(); mmAbort.set(bid, ctl);
   const ui2 = () => document.querySelector(`.blk[data-bid="${bid}"]`);
   const setUi = (busy, status) => { const el = ui2(); if (!el) return; const g = el.querySelector('[data-act="mm-gen"]'), s = el.querySelector('[data-act="mm-stop"]'), st = el.querySelector('.mm-ai .mm-status'); if (g) g.disabled = busy; if (s) s.hidden = !busy; if (st) st.textContent = status || ''; const ai = el.querySelector('.mm-ai'); if (ai && busy) ai.hidden = false; };
@@ -1314,7 +1625,7 @@ async function mmGenerate(x, mode) {
     b.text = code; touchDoc(c, id); mmErr.delete(bid); mmLast.delete(bid);
     if (!mmMode.get(bid) || mmMode.get(bid) === 'code') mmMode.set(bid, wideScreen() ? 'split' : 'prev');
     const el = ui2(); if (el) rerenderEditor(edCtx(el));
-    toast(mode === 'fix' ? 'Poprawiono kod schematu' : 'Schemat gotowy');
+    toast(mode === 'fix' ? 'Poprawiono kod schematu' : (isMap ? 'Mapa myśli gotowa' : 'Schemat gotowy'));
   } catch (e) {
     const msg = { cancelled:'', not_granted:'Bez zgody na pytania do Claude generowanie jest wyłączone w tym widoku.', rate_limited:'Za dużo zapytań naraz. Spróbuj za chwilę.', consent_dismissed:'Zamknięto okno zgody. Kliknij Generuj ponownie, aby spróbować.' }[e?.code];
     setUi(false, msg ?? 'Nie udało się wygenerować schematu. Spróbuj ponownie.');
@@ -1322,29 +1633,40 @@ async function mmGenerate(x, mode) {
   } finally { mmAbort.delete(bid); }
 }
 async function svgToPng(svgEl) {
-  const clone = svgEl.cloneNode(true); const vb = svgEl.viewBox?.baseVal; const r = svgEl.getBoundingClientRect();
+  const clone = svgEl.cloneNode(true); const vb = clone.viewBox?.baseVal; const r = svgEl.getBoundingClientRect();
   const w = Math.ceil((vb && vb.width) || r.width || 800), h = Math.ceil((vb && vb.height) || r.height || 600);
-  clone.setAttribute('width', w); clone.setAttribute('height', h); clone.setAttribute('xmlns', 'http://www.w3.org/2000/svg'); clone.removeAttribute('style');
+  clone.setAttribute('width', w); clone.setAttribute('height', h); clone.setAttribute('xmlns', 'http://www.w3.org/2000/svg');
+  const st = clone.getAttribute('style') || ''; clone.setAttribute('style', st.replace(/max-width:[^;]*;?/g, ''));
   const url = URL.createObjectURL(new Blob([new XMLSerializer().serializeToString(clone)], { type:'image/svg+xml' }));
   try {
     const img = new Image(); await new Promise((res, rej) => { img.onload = res; img.onerror = rej; img.src = url; });
-    const s = Math.min(3, Math.max(1, 2400 / Math.max(w, h)) * 1 || 2), cv = document.createElement('canvas'); cv.width = Math.round(w * s); cv.height = Math.round(h * s);
+    const s = Math.min(3, Math.max(1, 2400 / Math.max(w, h))), cv = document.createElement('canvas'); cv.width = Math.round(w * s); cv.height = Math.round(h * s);
     const g = cv.getContext('2d'); g.fillStyle = getComputedStyle(document.documentElement).getPropertyValue('--surface').trim() || '#fff'; g.fillRect(0, 0, cv.width, cv.height); g.drawImage(img, 0, 0, cv.width, cv.height);
     return await new Promise(res => cv.toBlob(res, 'image/png'));
   } finally { URL.revokeObjectURL(url); }
 }
+function exportableSvg(x) {
+  const isMap = x.b.type === 'mindmap';
+  const svgEl = x.blkEl.querySelector(isMap ? '.mk-prev svg' : '.mm-prev svg'); if (!svgEl) return null;
+  const clone = svgEl.cloneNode(true); clone.setAttribute('xmlns', 'http://www.w3.org/2000/svg');
+  const bg = getComputedStyle(document.documentElement).getPropertyValue('--surface').trim();
+  if (isMap) {
+    const g = svgEl.querySelector('g'); const bb = g.getBBox(); const pad = 24;
+    clone.querySelector('g')?.removeAttribute('transform');
+    clone.setAttribute('viewBox', `${bb.x - pad} ${bb.y - pad} ${bb.width + pad * 2} ${bb.height + pad * 2}`);
+    clone.setAttribute('width', Math.ceil(bb.width + pad * 2)); clone.setAttribute('height', Math.ceil(bb.height + pad * 2));
+    clone.setAttribute('style', (svgEl.getAttribute('style') || '') + `;background:${bg}`);
+  } else clone.setAttribute('style', `background:${bg}`);
+  return clone;
+}
 async function mmExport(x, fmt) {
-  const svgEl = x.blkEl.querySelector('.mm-prev svg');
-  if (!svgEl) { toast('Najpierw popraw schemat, żeby był widoczny podgląd.'); return; }
+  const clone = exportableSvg(x);
+  if (!clone) { toast('Najpierw popraw schemat, żeby był widoczny podgląd.'); return; }
   const base = norm(x.doc.title || x.doc.name || 'schemat').replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '') || 'schemat';
-  if (fmt === 'svg') {
-    const clone = svgEl.cloneNode(true); clone.setAttribute('xmlns', 'http://www.w3.org/2000/svg');
-    const bg = getComputedStyle(document.documentElement).getPropertyValue('--surface').trim();
-    clone.setAttribute('style', `background:${bg}`);
-    offerFile(`${base}-schemat.svg`, new XMLSerializer().serializeToString(clone), 'image/svg+xml'); return;
-  }
-  try { const blob = await svgToPng(svgEl); if (!blob) throw 0; offerFile(`${base}-schemat.png`, blob, 'image/png'); }
-  catch { toast('Nie udało się utworzyć PNG. Spróbuj eksportu SVG.'); }
+  const suffix = x.b.type === 'mindmap' ? 'mapa' : 'schemat';
+  if (fmt === 'svg') { offerFile(`${base}-${suffix}.svg`, new XMLSerializer().serializeToString(clone), 'image/svg+xml'); return; }
+  try { const blob = await svgToPng(clone); if (!blob) throw 0; offerFile(`${base}-${suffix}.png`, blob, 'image/png'); }
+  catch { toast('Ta przeglądarka nie pozwoliła utworzyć PNG. Zapisz jako SVG.'); }
 }
 
 /* ---------- popovers ---------- */
@@ -1391,7 +1713,7 @@ function renderSheet() {
   const dueChips = [['Dziś', todayISO()], ['Jutro', addDays(1)], ['Za tydzień', addDays(7)]];
   layer.innerHTML = `<div class="scrim" data-act="close-sheet"></div>
   <aside class="sheet" role="dialog" aria-label="Zadanie">
-    <div class="sheet-h"><div class="seg">${['todo','doing','done'].map(s => `<button class="${t.status === s ? 'on' : ''}" data-act="task-status" data-id="${id}" data-v="${s}">${esc(L().task[s])}</button>`).join('')}</div><span class="spacer"></span>
+    <div class="sheet-h"><div class="seg" style="flex-wrap:wrap">${['todo','doing','paused','done'].map(s => `<button class="${t.status === s ? 'on' : ''}" data-act="task-status" data-id="${id}" data-v="${s}">${esc(L().task[s])}</button>`).join('')}</div><span class="spacer"></span>
       <button class="iconbtn" data-act="task-del" data-id="${id}" aria-label="Usuń zadanie" title="Usuń zadanie">${ic('trash', 17)}</button>
       <button class="iconbtn" data-act="close-sheet" aria-label="Zamknij">${ic('x', 18)}</button></div>
     <div class="sheet-b">
@@ -2008,7 +2330,7 @@ function blocksMd(blocks) {
   return (blocks || []).map(b => { n = b.type === 'ol' ? n + 1 : 0; const t = b.text || '';
     switch (b.type) { case 'h1': return '# ' + t; case 'h2': return '## ' + t; case 'h3': return '### ' + t; case 'ul': return '- ' + t; case 'ol': return n + '. ' + t;
       case 'todo': return `- [${(b.taskId && store.tasks.get(b.taskId)?.status === 'done') || b.checked ? 'x' : ' '}] ` + t; case 'quote': return '> ' + t.replace(/\n/g, '\n> ');
-      case 'callout': return '> **' + t + '**'; case 'code': return '```\n' + t + '\n```'; case 'mermaid': return '```mermaid\n' + t + '\n```'; case 'hr': return '---'; default: return t; } }).join('\n\n');
+      case 'callout': return '> **' + t + '**'; case 'code': return '```\n' + t + '\n```'; case 'mermaid': return '```mermaid\n' + t + '\n```'; case 'mindmap': return '```mermaid\n' + outlineToMermaid(t) + '\n```'; case 'hr': return '---'; default: return t; } }).join('\n\n');
 }
 function exportMd() {
   const out = ['# Pracownia — eksport ' + todayISO(), ''];
@@ -2043,7 +2365,7 @@ async function importData(obj) {
 
 /* ---------- shell rendering ---------- */
 function renderSide() {
-  const t = todayISO(), open = openTasks();
+  const t = todayISO(), open = activeTasks();
   const nToday = open.filter(x => x.due && x.due <= t).length, nOver = open.filter(x => x.due && x.due < t).length;
   const act = ui.view === 'project' ? 'projects' : ui.view === 'note' ? 'notes' : ui.view;
   const N = [['home','Start','home', ''], ['tasks','Zadania','tasks', nToday ? `<span class="count ${nOver ? 'hot' : ''}">${nToday}</span>` : ''], ['projects','Projekty','folder', ''], ['notes','Notatki','note', ''], ['time','Czas pracy','clock', '']];
@@ -2131,7 +2453,7 @@ function delProject(id) {
 /* ---------- events ---------- */
 document.addEventListener('click', e => {
   const pop = $('#pop');
-  if (!pop.hidden && !pop.contains(e.target) && !e.target.closest('[data-act="blk-menu"],[data-act="proj-style"]')) { closePop(); closeSlash(); }
+  if (!pop.hidden && !pop.contains(e.target) && !e.target.closest('[data-act="blk-menu"],[data-act="proj-style"],[data-act="mm-style"],[data-act="mm-tpl"]')) { closePop(); closeSlash(); }
   const el = e.target.closest('[data-act]'); if (!el) return;
   const a = el.dataset.act, id = el.dataset.id, v = el.dataset.v;
   switch (a) {
@@ -2190,11 +2512,25 @@ document.addEventListener('click', e => {
     case 'mm-tpl': { const x = edCtx(el); if (!x) break; openPop(el, `<div class="pop-l eyebrow">Szablon schematu</div>${MM_TPL.map(([k, l]) => `<button class="pop-i" data-act="mm-tpl-pick" data-v="${k}">${esc(l)}</button>`).join('')}`, { kind:'block', c:x.c, id:x.id, bid:x.b.id }); break; }
     case 'mm-tpl-pick': {
       const x = el.closest('.editor') ? edCtx(el) : popBlockCtx(); closePop(); if (!x) break;
+      if (v === 'mind') { x.b.type = 'mindmap'; x.b.text = x.b.text?.trim() && /^\s*mindmap/.test(x.b.text) ? mermaidToOutline(x.b.text) : MK_TPL; mmMode.set(x.b.id, wideScreen() ? 'split' : 'prev'); touchDoc(x.c, x.id); rerenderEditor(x); break; }
       const old = x.b.text, t = MM_TPL.find(m => m[0] === v); if (!t) break;
       x.b.text = t[2]; touchDoc(x.c, x.id); mmErr.delete(x.b.id); mmLast.delete(x.b.id);
       mmMode.set(x.b.id, wideScreen() ? 'split' : 'prev'); rerenderEditor(x);
       if (old && old.trim()) { const c = x.c, id = x.id, bid = x.b.id; toast('Wstawiono szablon', 'Cofnij', () => { const b = mmBlockById(c, id, bid); if (!b) return; b.text = old; touchDoc(c, id); mmLast.delete(bid); const blk = document.querySelector(`.blk[data-bid="${bid}"]`); if (blk) rerenderEditor(edCtx(blk)); }); }
       break; }
+    case 'mk-sample': { const x = edCtx(el); if (!x) break; x.b.text = MK_TPL; mmMode.set(x.b.id, wideScreen() ? 'split' : 'prev'); touchDoc(x.c, x.id); rerenderEditor(x); break; }
+    case 'mm-zoom': { const prev = el.closest('.mm-prev'); if (!prev) break; if (v === 'fit') { mmView.delete(prev.dataset.bid); applyView(prev); } else zoomAt(prev, v === 'in' ? 1.25 : 0.8); break; }
+    case 'mk-zoom': { const prev = el.closest('.mk-prev'); const mk = prev?._mk; if (!mk) break; if (v === 'fit') { try { mk.fit(); } catch {} } else { const k = window.d3?.zoomTransform(mk.svg.node()).k || 1; mk.rescale(k * (v === 'in' ? 1.25 : 0.8)); } break; }
+    case 'mm-full': { const blk = el.closest('.blk'); if (blk) toggleFull(blk); break; }
+    case 'mm-style': mmStyleMenu(el); break;
+    case 'mm-layout': case 'mm-look': { const x = popBlockCtx(); closePop(); if (!x) break; if (a === 'mm-layout') x.b.layout = v; else x.b.look = v; touchDoc(x.c, x.id); if (v === 'elk' && !elkReady) await_elk(x); else rerenderEditor(x); break; }
+    case 'mk-fold': { const x = edCtx(el); if (!x) break; mkLevel.set(x.b.id, +v); x.blkEl.querySelectorAll('[data-act="mk-fold"]').forEach(btn => btn.classList.toggle('on', btn.dataset.v === v)); const prev = x.blkEl.querySelector('.mk-prev'); if (prev) renderMindmapEl(prev, true); break; }
+    case 'note-mindmap': {
+      const n = store.notes.get(id); if (!n) break; const outline = noteToOutline(n);
+      if (!outline) { toast('Notatka nie ma jeszcze nagłówków ani list, z których można zrobić mapę.'); break; }
+      const nbk = { id:uid(), type:'mindmap', text:outline }; n.blocks.push(nbk); n.updatedAt = Date.now(); save('notes', id, 300);
+      render(); setTimeout(() => document.querySelector(`.blk[data-bid="${nbk.id}"]`)?.scrollIntoView({ behavior:'smooth', block:'center' }), 80);
+      toast('Dodano mapę myśli na końcu notatki'); break; }
     case 'mm-ai': { const x = edCtx(el); if (!x) break; const ai = x.blkEl.querySelector('.mm-ai'); ai.hidden = !ai.hidden; if (!ai.hidden) ai.querySelector('textarea')?.focus(); break; }
     case 'mm-gen': { const x = edCtx(el); if (x) mmGenerate(x, 'new'); break; }
     case 'mm-fix': { const x = edCtx(el); if (x) mmGenerate(x, 'fix'); break; }
@@ -2234,11 +2570,13 @@ document.addEventListener('click', e => {
 });
 document.addEventListener('keydown', e => {
   const t = e.target;
+  if (e.key === 'Escape' && !slash && document.querySelector('.mm.full')) { e.preventDefault(); toggleFull(document.querySelector('.mm.full').closest('.blk'), false); return; }
   if (t.classList && t.classList.contains('bt')) { onEdKeydown(e, t); return; }
   if (t.classList && t.classList.contains('mm-ask') && e.key === 'Enter' && (e.ctrlKey || e.metaKey)) { e.preventDefault(); const x = edCtx(t); if (x) mmGenerate(x, 'new'); return; }
   if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'k') { e.preventDefault(); openModal('palette'); return; }
   if (e.key === 'Escape') {
     if (!$('#pop').hidden) { closePop(); closeSlash(); return; }
+    const fs = document.querySelector('.mm.full'); if (fs) { toggleFull(fs.closest('.blk'), false); return; }
     if (ui.modal) { closeModal(); return; }
     if (ui.taskOpen) { ui.taskOpen = null; render(); return; }
   }
@@ -2381,7 +2719,7 @@ document.addEventListener('dragend', () => { drag = null; document.querySelector
 /* mobile keyboard bar */
 function renderKb() {
   const bar = $('#kbbar'); if (bar.dataset.ready) return; bar.dataset.ready = '1';
-  const K = [['p','T'], ['h1','H1'], ['h2','H2'], ['ul','•'], ['ol','1.'], ['todo','☐'], ['quote','„'], ['callout','!'], ['code','{}'], ['mermaid','◇'], ['hr','—']];
+  const K = [['p','T'], ['h1','H1'], ['h2','H2'], ['ul','•'], ['ol','1.'], ['todo','☐'], ['quote','„'], ['callout','!'], ['code','{}'], ['mindmap','✳'], ['mermaid','◇'], ['hr','—']];
   bar.innerHTML = K.map(([t, l]) => `<button data-kb="${t}" aria-label="${esc(BT.find(b => b[0] === t)[1])}">${l}</button>`).join('') + `<button class="done" data-kb="done">Gotowe</button>`;
   bar.addEventListener('mousedown', e => e.preventDefault());
   bar.addEventListener('pointerdown', e => { if (e.pointerType !== 'mouse') e.preventDefault(); });

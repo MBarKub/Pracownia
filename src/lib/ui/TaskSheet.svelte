@@ -3,7 +3,7 @@
 	import { delTask, L, projectsSorted, setTaskStatus } from '#lib/ops.ts';
 	import { ui } from '#lib/ui.svelte.ts';
 	import { addDays, fmtTs, todayISO, uid } from '#lib/util.ts';
-	import type { TaskStatus } from '#lib/model.ts';
+	import { TASK_STATUSES } from '#lib/model.ts';
 	import Icon from './Icon.svelte';
 
 	const id = $derived(ui.taskOpen);
@@ -58,8 +58,8 @@
 	<div class="scrim" role="presentation" onclick={close}></div>
 	<div class="sheet" role="dialog" aria-modal="true" aria-label="Zadanie">
 		<div class="sheet-h">
-			<div class="seg">
-				{#each ['todo', 'doing', 'done'] as TaskStatus[] as s (s)}
+			<div class="seg" style="flex-wrap:wrap">
+				{#each TASK_STATUSES as s (s)}
 					<button class:on={t.status === s} onclick={() => setTaskStatus(id, s)}
 						>{L().task[s]}</button
 					>

@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { app, arr } from '#lib/store.svelte.ts';
-	import { L, openTasks, taskSort } from '#lib/ops.ts';
+	import { L, activeTasks, taskSort } from '#lib/ops.ts';
 	import { addDays, plural, todayISO } from '#lib/util.ts';
 	import TaskRow from '#lib/ui/TaskRow.svelte';
 	import AddLine from '#lib/ui/AddLine.svelte';
@@ -15,7 +15,7 @@
 		month: 'long'
 	}).format(new Date());
 	const t = todayISO();
-	const open = $derived(openTasks());
+	const open = $derived(activeTasks());
 	const today = $derived(open.filter((x) => x.due && x.due <= t).sort(taskSort));
 	const doing = $derived(
 		open.filter((x) => x.status === 'doing' && !(x.due && x.due <= t)).sort(taskSort)

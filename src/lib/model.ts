@@ -3,7 +3,19 @@
 // Zamianę na wiersze bazy robi mappers.ts.
 
 export type BlockType =
-	'p' | 'h1' | 'h2' | 'h3' | 'ul' | 'ol' | 'todo' | 'quote' | 'callout' | 'code' | 'mermaid' | 'hr';
+	| 'p'
+	| 'h1'
+	| 'h2'
+	| 'h3'
+	| 'ul'
+	| 'ol'
+	| 'todo'
+	| 'quote'
+	| 'callout'
+	| 'code'
+	| 'mermaid'
+	| 'mindmap'
+	| 'hr';
 
 export interface Block {
 	id: string;
@@ -11,9 +23,13 @@ export interface Block {
 	text: string;
 	checked?: boolean;
 	taskId?: string;
+	/** tylko blok `mermaid`: silnik układu (domyślnie ELK) i wygląd (klasyczny albo szkic) */
+	layout?: 'elk' | 'dagre';
+	look?: 'classic' | 'handDrawn';
 }
 
-export type TaskStatus = 'todo' | 'doing' | 'done';
+export type TaskStatus = 'todo' | 'doing' | 'paused' | 'done';
+export const TASK_STATUSES: TaskStatus[] = ['todo', 'doing', 'paused', 'done'];
 export type ProjectStatus = 'idea' | 'active' | 'paused' | 'done';
 
 export interface Project {

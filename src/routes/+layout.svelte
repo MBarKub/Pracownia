@@ -60,7 +60,7 @@
 
 	const counts = $derived.by(() => {
 		const t = todayISO();
-		const open = arr('tasks').filter((x) => x.status !== 'done');
+		const open = arr('tasks').filter((x) => x.status !== 'done' && x.status !== 'paused');
 		return {
 			today: open.filter((x) => x.due && x.due <= t).length,
 			over: open.filter((x) => x.due && x.due < t).length

@@ -15,7 +15,11 @@ grant usage on schema auth to authenticated;
 grant execute on function auth.uid() to authenticated;
 create publication supabase_realtime;
 `);
-await db.exec(readFileSync(new URL("../migrations/20261025000000_init.sql", import.meta.url), 'utf8'));
+import { readdirSync } from 'node:fs';
+const migDir = new URL('../migrations/', import.meta.url);
+for (const f of readdirSync(migDir).filter((f) => f.endsWith('.sql')).sort()) {
+  await db.exec(readFileSync(new URL(f, migDir), 'utf8'));
+}
 await db.exec(`grant usage on schema public to authenticated; grant all on all tables in schema public to authenticated;`);
 console.log('migration OK');
 
@@ -61,3 +65,7 @@ r = await as(A, `select data from user_settings`);
 check('A sees only own settings', r.rows.length === 1);
 r = await as(A, `insert into workspace_members (workspace_id, user_id, role) values ($1, $2, 'owner')`, [wsB, A]);
 check('A cannot join B ws', !!r.error);
+r = await as(A, `update tasks set status='paused' where id='t1' returning status`);
+check('task can be paused', !r.error && r.rows[0]?.status === 'paused');
+r = await as(A, `update tasks set status='blocked' where id='t1'`);
+check('unknown task status rejected', !!r.error);
