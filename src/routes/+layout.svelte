@@ -26,6 +26,11 @@
 	import Icon from '#lib/ui/Icon.svelte';
 	import Login from '#lib/ui/Login.svelte';
 	import TaskSheet from '#lib/ui/TaskSheet.svelte';
+	import TimePill from '#lib/ui/time/TimePill.svelte';
+	import TimeModal from '#lib/ui/time/TimeModal.svelte';
+	import ReportModal from '#lib/ui/time/ReportModal.svelte';
+	import { ui } from '#lib/ui.svelte.ts';
+	import { runningEntry } from '#lib/time.svelte.ts';
 	import type { IconName } from '#lib/ui/icons.ts';
 
 	let { children }: LayoutProps = $props();
@@ -123,6 +128,7 @@
 					{/each}
 				</div>
 			{/if}
+			<TimePill where="side" />
 			<div class="side-foot">
 				<a class="nav-i" class:on={isOn('/ustawienia')} href="/ustawienia"
 					><Icon name="sliders" />Ustawienia</a
@@ -139,7 +145,11 @@
 			</div>
 		</aside>
 		<header class="topbar">
-			<div class="t"><span class="brand-mark"><i></i><i></i><i></i><i></i></span>{title}</div>
+			<div class="t">
+				<span class="brand-mark"><i></i><i></i><i></i><i></i></span>{#if runningEntry()}<TimePill
+						where="top"
+					/>{:else}{title}{/if}
+			</div>
 			<a class="iconbtn" href="/czas" aria-label="Czas pracy"><Icon name="clock" size={20} /></a>
 			<a class="iconbtn" href="/ustawienia" aria-label="Ustawienia"
 				><Icon name="sliders" size={20} /></a
@@ -162,6 +172,15 @@
 		</nav>
 	</div>
 	<TaskSheet />
+	{#if ui.modal?.kind === 'time'}
+		{#key ui.modal}<TimeModal
+				id={ui.modal.id}
+				projectId={ui.modal.projectId}
+				taskId={ui.modal.taskId}
+			/>{/key}
+	{:else if ui.modal?.kind === 'report'}
+		{#key ui.modal}<ReportModal projectId={ui.modal.projectId} client={ui.modal.client} />{/key}
+	{/if}
 {/if}
 
 {#if app.toastMsg}

@@ -38,7 +38,9 @@ export default defineConfig(
 		// 'svelte/button-has-type': 'error'
 		rules: {
 			// aplikacja działa w katalogu głównym domeny, bez paths.base
-			'svelte/no-navigation-without-resolve': 'off'
+			'svelte/no-navigation-without-resolve': 'off',
+			// Date i Map służą tu do obliczeń w funkcjach i $derived, nie jako stan; stan żyje w $state
+			'svelte/prefer-svelte-reactivity': 'off'
 		}
 	},
 	{ ignores: ['reference/', 'src/lib/pdf/fonts.ts'] }

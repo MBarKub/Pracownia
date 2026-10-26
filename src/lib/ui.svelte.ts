@@ -19,6 +19,16 @@ class UiState {
 	projFilter = $state(saved.projFilter || 'active');
 	noteQuery = $state('');
 	noteTag = $state('');
+	timeProject = $state('');
+	timeClient = $state('');
+	/** stoper w widoku Czasu: wybrany projekt, zadanie i opis przed startem */
+	td = $state({ projectId: '', taskId: '', note: '' });
+	/** okna: wpis czasu i raport PDF */
+	modal = $state<
+		| { kind: 'time'; id?: string; projectId?: string; taskId?: string }
+		| { kind: 'report'; projectId?: string; client?: string }
+		| null
+	>(null);
 }
 
 export const ui = new UiState();

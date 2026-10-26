@@ -12,6 +12,7 @@
 	import NoteCard from '#lib/ui/NoteCard.svelte';
 	import TitleInput from '#lib/ui/TitleInput.svelte';
 	import Editor from '#lib/ui/editor/Editor.svelte';
+	import ProjectTimePanel from '#lib/ui/time/ProjectTimePanel.svelte';
 
 	const id = $derived(page.params.id || '');
 	const p = $derived(app.data.projects[id]);
@@ -208,6 +209,7 @@
 						</details>
 					{/if}
 				</section>
+				<ProjectTimePanel {id} />
 				<section class="panel">
 					<div class="panel-h">
 						<h2>Notatki</h2>

@@ -5,6 +5,17 @@
 	import { addDays, fmtTs, todayISO, uid } from '#lib/util.ts';
 	import { TASK_STATUSES } from '#lib/model.ts';
 	import Icon from './Icon.svelte';
+	import {
+		clock,
+		fmtClock,
+		fmtDur,
+		runningEntry,
+		startTimer,
+		stopTimer,
+		timeEntries,
+		useClock
+	} from '#lib/time.svelte.ts';
+	import { plural } from '#lib/util.ts';
 
 	const id = $derived(ui.taskOpen);
 	const t = $derived(id ? app.data.tasks[id] : undefined);
@@ -27,6 +38,14 @@
 	);
 
 	let newSub = $state('');
+
+	const tEnt = $derived(id ? timeEntries((e) => e.taskId === id) : []);
+	const tTot = $derived(tEnt.reduce((s, e) => s + e.minutes, 0));
+	const tRun = $derived.by(() => {
+		const r = runningEntry();
+		return r && r.taskId === id ? r : undefined;
+	});
+	$effect(() => (tRun ? useClock() : undefined));
 
 	function autosize(el: HTMLTextAreaElement) {
 		const fit = () => {
@@ -221,6 +240,36 @@
 							}}
 						/>
 					</label>
+				</div>
+			</div>
+
+			<div class="field">
+				<span class="lbl"
+					>Czas pracy{#if tTot}
+						· {fmtDur(tTot)} w {tEnt.length}
+						{plural(tEnt.length, 'wpisie', 'wpisach', 'wpisach')}{/if}</span
+				>
+				<div class="btnrow">
+					{#if tRun}
+						<button
+							class="btn sm stop"
+							onclick={() =>
+								stopTimer(tRun.id, false, (eid) => (ui.modal = { kind: 'time', id: eid }))}
+							><Icon name="stop" size={13} />Zatrzymaj
+							<span style="font-family:var(--f-mono)"
+								>{fmtClock(clock.now - (tRun.start || clock.now))}</span
+							></button
+						>
+					{:else}
+						<button class="btn sm primary" onclick={() => startTimer({ taskId: id })}
+							><Icon name="play" size={13} />Start</button
+						>
+					{/if}
+					<button
+						class="btn sm"
+						onclick={() => (ui.modal = { kind: 'time', taskId: id, projectId: t.projectId || '' })}
+						><Icon name="plus" size={13} />Dodaj wpis</button
+					>
 				</div>
 			</div>
 

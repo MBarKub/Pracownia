@@ -48,7 +48,6 @@ export function getDoc<C extends CollectionName>(c: C, id: string): Collections[
 
 /* ---------- zapis ---------- */
 // celowo nie reaktywne: to stan kolejki zapisu, nie interfejsu
-// eslint-disable-next-line svelte/prefer-svelte-reactivity
 const dirty = new Set<string>();
 const timers: Record<string, ReturnType<typeof setTimeout>> = {};
 const inflight: Record<string, { again: boolean }> = {};

@@ -23,9 +23,9 @@ Kontekst i decyzje: `reference/brief.md`. Pełny kod oryginału, z którego prze
 | Projekty, Notatki, edytor blokowy (menu „/”, skróty, przeciąganie)       | gotowe                            |
 | Schematy Mermaid i mapy myśli w edytorze                                 | gotowe                            |
 | Status zadania „Wstrzymane”                                              | gotowe                            |
-| Czas pracy, raporty PDF                                                  | do przeniesienia                  |
+| Czas pracy: stoper, wpisy, okresy, wykres, raporty PDF                   | gotowe                            |
 | Okno Wygląd (własne skórki), wyszukiwarka, szybkie dodawanie, import .md | do przeniesienia                  |
-| Czas pracy w projekcie (panel na stronie projektu)                       | razem z widokiem Czasu            |
+| Czas w oknie zadania i na stronie projektu                               | gotowe                            |
 
 ## Schematy i mapy myśli
 
