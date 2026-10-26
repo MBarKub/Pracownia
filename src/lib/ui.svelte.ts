@@ -1,7 +1,12 @@
 // Stan interfejsu (nie trafia do bazy). Część ustawień widoków zapamiętujemy w przeglądarce, jak w v4.
 import { lsGet, lsSet } from './util';
 
-type Saved = { taskTab?: 'list' | 'board'; showDone?: boolean; timeRange?: string };
+type Saved = {
+	taskTab?: 'list' | 'board';
+	showDone?: boolean;
+	timeRange?: string;
+	projFilter?: string;
+};
 const saved = lsGet<Saved>('pracownia-ui') || {};
 
 class UiState {
@@ -11,10 +16,18 @@ class UiState {
 	taskProject = $state('');
 	showDone = $state(!!saved.showDone);
 	timeRange = $state(saved.timeRange || 'week');
+	projFilter = $state(saved.projFilter || 'active');
+	noteQuery = $state('');
+	noteTag = $state('');
 }
 
 export const ui = new UiState();
 
 export function persistUi() {
-	lsSet('pracownia-ui', { taskTab: ui.taskTab, showDone: ui.showDone, timeRange: ui.timeRange });
+	lsSet('pracownia-ui', {
+		taskTab: ui.taskTab,
+		showDone: ui.showDone,
+		timeRange: ui.timeRange,
+		projFilter: ui.projFilter
+	});
 }

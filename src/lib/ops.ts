@@ -125,3 +125,61 @@ export const projectsSorted = () =>
 	arr('projects').sort((a, b) => (a.name || '').localeCompare(b.name || '', 'pl'));
 
 export const L = () => app.settings.labels;
+
+export const clients = () =>
+	[
+		...new Set(
+			arr('projects')
+				.map((p) => (p.client || '').trim())
+				.filter(Boolean)
+		)
+	].sort((a, b) => a.localeCompare(b, 'pl'));
+
+/** Usuwa notatkę z możliwością cofnięcia; zwraca projekt, do którego należała */
+export function delNote(id: string, onUndo?: () => void) {
+	const n = app.data.notes[id];
+	if (!n) return '';
+	const copy = clone(n);
+	removeDoc('notes', id);
+	toast('Usunięto notatkę', 'Cofnij', () => {
+		app.data.notes[id] = copy;
+		save('notes', id);
+		onUndo?.();
+	});
+	return copy.projectId;
+}
+
+/** Usuwa projekt; zadania, notatki i wpisy czasu zostają bez projektu (cofnięcie przywraca powiązania) */
+export function delProject(id: string, onUndo?: () => void) {
+	const p = app.data.projects[id];
+	if (!p) return;
+	const copy = clone(p);
+	const linked: ['tasks' | 'notes' | 'time', string][] = [];
+	for (const c of ['tasks', 'notes', 'time'] as const)
+		for (const [xid, x] of Object.entries(app.data[c]))
+			if (x.projectId === id) {
+				linked.push([c, xid]);
+				x.projectId = '';
+				save(c, xid, 50);
+			}
+	removeDoc('projects', id);
+	toast(
+		`Usunięto projekt${linked.length ? '. Zadania i notatki zostały bez projektu' : ''}`,
+		'Cofnij',
+		() => {
+			app.data.projects[id] = copy;
+			save('projects', id);
+			// powiązania zapisujemy po projekcie, żeby klucz obcy w bazie już istniał
+			setTimeout(() => {
+				for (const [c, xid] of linked) {
+					const x = app.data[c][xid];
+					if (x) {
+						x.projectId = id;
+						save(c, xid);
+					}
+				}
+			}, 600);
+			onUndo?.();
+		}
+	);
+}
